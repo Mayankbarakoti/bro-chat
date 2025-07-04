@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bro‑Chat 💀 - Group Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #ffe9e9, #fefefe);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(to bottom, #ff4d4d, #a833ff);
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      justify-content: space-between;
+    }
+
+    .sidebar h3 {
+      font-size: 20px;
+    }
+
+    .sidebar button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      color: #a833ff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .sidebar button:hover {
+      background: #ffd1d1;
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 20px;
+      backdrop-filter: blur(6px);
+      position: relative;
+    }
+
+    .group-header {
+      font-weight: 600;
+      font-size: 18px;
+      color: #cc2b2b;
+      margin-bottom: 10px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #f1f1f1;
+      padding: 10px 15px;
+      border-radius: 8px;
+      max-width: 70%;
+    }
+
+    .message.user {
+      background: #cc2b2b;
+      color: white;
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .message .text {
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .typing {
+      font-size: 13px;
+      color: #555;
+      margin: 5px 0;
+      display: none;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 25px;
+      border: 1px solid #aaa;
+      outline: none;
+    }
+
+    .chat-input button {
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: none;
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .group-selection {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .group-selection input {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    .group-selection button {
+      padding: 10px;
+      border: none;
+      background: #a833ff;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <h3>Group Options</h3>
+      <button onclick="openGroupSelection()">🔗 Join/Create Group</button>
+      <button onclick="leaveGroup()">❌ Leave Group</button>
+      <button onclick="newGroup()">🔄 New Group</button>
+    </div>
+    <small>Anonymous Group Chat 💀</small>
+  </div>
+
+  <div class="chat-container">
+    <div class="group-header" id="groupTitle">Not in a group yet</div>
+
+    <div class="messages" id="chatBox"></div>
+
+    <div class="typing" id="typingIndicator">Someone is typing...</div>
+
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div class="group-selection" id="groupModal">
+      <h3>Join or Create a Group</h3>
+      <input type="text" id="groupInput" placeholder="Enter group name..." />
+      <button onclick="joinGroup()">Enter Group</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const messageInput = document.getElementById("messageInput");
+    const groupTitle = document.getElementById("groupTitle");
+    const groupModal = document.getElementById("groupModal");
+    const groupInput = document.getElementById("groupInput");
+    const typingIndicator = document.getElementById("typingIndicator");
+
+    const profile = JSON.parse(localStorage.getItem("brochatProfile")) || {};
+    const nick = profile.nickname || "Anonymous";
+    const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
+
+    let currentGroup = "";
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(`${protocol}://${location.host}`);
+
+    socket.onopen = () => console.log("Connected to WebSocket");
+
+    socket.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      if (d.type === "system") {
+        if (d.event === "joinedGroup") addSystemMessage(`🔒 Joined ${d.group}`);
+        if (d.event === "leftGroup") addSystemMessage(`🚪 Left group`);
+      }
+      if (d.type === "messageGroup") appendGroupMsg(d.nickname, d.avatar, d.text);
+      if (d.type === "typingGroup") showTypingIndicator(d.nickname);
+    };
+
+    function openGroupSelection() {
+      groupModal.style.display = "flex";
+    }
+
+    function joinGroup() {
+      const groupName = groupInput.value.trim();
+      if (!groupName) return;
+      currentGroup = groupName;
+      groupTitle.textContent = `Group: ${groupName}`;
+      groupModal.style.display = "none";
+      chatBox.innerHTML = "";
+      socket.send(JSON.stringify({ type: "joinGroup", group: groupName, nickname: nick, avatar }));
+    }
+
+    function leaveGroup() {
+      if (confirm("Leave the current group?")) {
+        socket.send(JSON.stringify({ type: "leaveGroup" }));
+        currentGroup = "";
+        groupTitle.textContent = "Not in a group yet";
+        chatBox.innerHTML = "";
+      }
+    }
+
+    function newGroup() {
+      leaveGroup();
+      openGroupSelection();
+    }
+
+    function sendMessage() {
+      const msg = messageInput.value.trim();
+      if (!msg) return;
+      appendGroupMsg(nick, avatar, msg, true);
+      socket.send(JSON.stringify({ type: "messageGroup", text: msg }));
+      messageInput.value = "";
+    }
+
+    function appendGroupMsg(nickname, avatarURL, text, isMe = false) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = "message" + (isMe ? " user" : "");
+      msgDiv.innerHTML = `
+        <img class="avatar" src="${avatarURL}" alt="${nickname}" />
+        <div class="text"><strong>${nickname}</strong><br>${text}</div>
+      `;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addSystemMessage(text) {
+      const sys = document.createElement("div");
+      sys.className = "system-msg";
+      sys.style = "text-align:center; margin:10px; color:#888; font-style:italic;";
+      sys.textContent = text;
+      chatBox.appendChild(sys);
+    }
+
+    function showTypingIndicator(sender) {
+      typingIndicator.textContent = `${sender} is typing...`;
+      typingIndicator.style.display = "block";
+      clearTimeout(window.typingTimeout);
+      window.typingTimeout = setTimeout(() => {
+        typingIndicator.style.display = "none";
+      }, 2000);
+    }
+
+    messageInput.addEventListener("input", () => {
+      socket.send(JSON.stringify({ type: "typingGroup" }));
+    });
+
+    messageInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") leaveGroup();
+    });
+  </script>
+
+</body>
+</html>

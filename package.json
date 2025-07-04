@@ -9,9 +9,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.1.0",
-    "ws": "^8.18.2"
-  }
+    "ws": "^8.18.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mayankbarakoti/bro-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mayankbarakoti/bro-chat/issues"
+  },
+  "homepage": "https://github.com/Mayankbarakoti/bro-chat#readme",
+  "description": ""
 }

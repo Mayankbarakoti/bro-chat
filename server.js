@@ -4,88 +4,223 @@ const WebSocket = require('ws');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Serve static files from public folder (index.html, profile.html, chat.html)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Create HTTP server and attach Express app
 const server = http.createServer(app);
 
-// Create WebSocket server on the same HTTP server
+// Serve frontend files from /public
+app.use(express.static(path.join(__dirname, 'public')));
+
+// WebSocket server on same HTTP server (upgrade handled internally)
 const wss = new WebSocket.Server({ server });
 
-// To keep track of waiting user for pairing
-let waitingUser = null;
+// Data structures to manage users and groups
+let waitingUser = null; // waiting for 1-on-1 pairing
+const pairings = new Map(); // ws -> partner ws for 1-on-1
+const rooms = new Map(); // groupName -> Set of ws in group
+const userMeta = new Map(); // ws -> {type, nickname, avatar, group?}
 
-// Function to pair two users
-function pairUsers(ws1, ws2) {
-  ws1.partner = ws2;
-  ws2.partner = ws1;
-
-  // Inform both users that they are connected
-  ws1.send(JSON.stringify({ type: 'info', message: 'You are connected to a chat partner.' }));
-  ws2.send(JSON.stringify({ type: 'info', message: 'You are connected to a chat partner.' }));
+// Utility to send JSON safely
+function send(ws, data) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(data));
+  }
 }
 
-// Handle WebSocket connections
-wss.on('connection', (ws) => {
-  console.log('New user connected');
+// Pair two 1-on-1 users
+function pairUsers(user1, user2) {
+  pairings.set(user1, user2);
+  pairings.set(user2, user1);
 
-  // If someone is waiting, pair them
-  if (waitingUser) {
-    pairUsers(waitingUser, ws);
-    waitingUser = null;
-  } else {
-    // No one waiting, so current user waits
-    waitingUser = ws;
-    ws.send(JSON.stringify({ type: 'info', message: 'Waiting for a chat partner...' }));
+  send(user1, { type: 'system', event: 'partner_connected', text: 'Connected to a stranger!' });
+  send(user2, { type: 'system', event: 'partner_connected', text: 'Connected to a stranger!' });
+}
+
+// Disconnect 1-on-1 user and notify partner
+function disconnect1v1(ws, notifyPartner = true) {
+  const partner = pairings.get(ws);
+  if (partner) {
+    pairings.delete(partner);
+    pairings.delete(ws);
+    if (notifyPartner) {
+      send(partner, { type: 'system', event: 'partner_disconnected', text: 'Stranger disconnected.' });
+    }
   }
+  if (waitingUser === ws) waitingUser = null;
+  userMeta.delete(ws);
+}
 
-  // Listen for messages from client
-  ws.on('message', (message) => {
-    console.log('Received:', message);
+// Remove user from a group
+function leaveGroup(ws) {
+  const meta = userMeta.get(ws);
+  if (meta && meta.group) {
+    const groupName = meta.group;
+    const members = rooms.get(groupName);
+    if (members) {
+      members.delete(ws);
+      if (members.size === 0) {
+        rooms.delete(groupName); // delete empty group
+      }
+    }
+    meta.group = null;
+    send(ws, { type: 'system', event: 'leftGroup', text: `Left group "${groupName}"` });
+  }
+  userMeta.set(ws, {...userMeta.get(ws), group: null});
+}
 
-    // Forward message to partner if connected
-    if (ws.partner && ws.partner.readyState === WebSocket.OPEN) {
-      ws.partner.send(message);
+wss.on('connection', (ws) => {
+  console.log('New WebSocket connection');
+
+  ws.on('message', (raw) => {
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      console.warn('Invalid JSON:', raw);
+      return;
+    }
+
+    switch (data.type) {
+      // 1-on-1 chat join request
+      case 'join1v1': {
+        userMeta.set(ws, { type: '1v1', nickname: data.nickname, avatar: data.avatar, group: null });
+        if (waitingUser && waitingUser !== ws && waitingUser.readyState === WebSocket.OPEN) {
+          pairUsers(ws, waitingUser);
+          waitingUser = null;
+        } else {
+          waitingUser = ws;
+          send(ws, { type: 'system', event: 'waiting', text: 'Waiting for a stranger to connect...' });
+        }
+        break;
+      }
+
+      // 1-on-1 chat message
+      case 'message1v1': {
+        const partner = pairings.get(ws);
+        if (partner && partner.readyState === WebSocket.OPEN) {
+          const meta = userMeta.get(ws) || {};
+          send(partner, {
+            type: 'message1v1',
+            text: data.text,
+            nickname: meta.nickname,
+            avatar: meta.avatar,
+          });
+        }
+        break;
+      }
+
+      // 1-on-1 typing indicator
+      case 'typing1v1': {
+        const partner = pairings.get(ws);
+        if (partner && partner.readyState === WebSocket.OPEN) {
+          send(partner, { type: 'typing1v1', nickname: userMeta.get(ws)?.nickname || '' });
+        }
+        break;
+      }
+
+      // 1-on-1 leave / disconnect / new chat
+      case 'leave1v1':
+      case 'disconnect1v1': {
+        disconnect1v1(ws);
+        break;
+      }
+      case 'new1v1': {
+        disconnect1v1(ws, false);
+        if (waitingUser && waitingUser !== ws && waitingUser.readyState === WebSocket.OPEN) {
+          pairUsers(ws, waitingUser);
+          waitingUser = null;
+        } else {
+          waitingUser = ws;
+          send(ws, { type: 'system', event: 'waiting', text: 'Waiting for a stranger to connect...' });
+        }
+        break;
+      }
+
+      // Group chat join
+      case 'joinGroup': {
+        userMeta.set(ws, { type: 'group', nickname: data.nickname, avatar: data.avatar, group: data.group });
+        if (!rooms.has(data.group)) rooms.set(data.group, new Set());
+        rooms.get(data.group).add(ws);
+        send(ws, { type: 'system', event: 'joinedGroup', group: data.group, text: `Joined group "${data.group}"` });
+        break;
+      }
+
+      // Group chat message broadcast
+      case 'messageGroup': {
+        const meta = userMeta.get(ws);
+        if (!meta || !meta.group) return;
+        const groupName = meta.group;
+        const members = rooms.get(groupName);
+        if (!members) return;
+        const messageData = {
+          type: 'messageGroup',
+          text: data.text,
+          nickname: meta.nickname,
+          avatar: meta.avatar,
+        };
+        for (const client of members) {
+          if (client.readyState === WebSocket.OPEN && client !== ws) {
+            send(client, messageData);
+          }
+        }
+        break;
+      }
+
+      // Group typing indicator broadcast
+      case 'typingGroup': {
+        const meta = userMeta.get(ws);
+        if (!meta || !meta.group) return;
+        const groupName = meta.group;
+        const members = rooms.get(groupName);
+        if (!members) return;
+        for (const client of members) {
+          if (client.readyState === WebSocket.OPEN && client !== ws) {
+            send(client, { type: 'typingGroup', nickname: meta.nickname });
+          }
+        }
+        break;
+      }
+
+      // Group leave
+      case 'leaveGroup': {
+        leaveGroup(ws);
+        break;
+      }
+
+      // Handle report/block events if needed
+      case 'report': {
+        console.log(`🚨 Report from ${userMeta.get(ws)?.nickname}:`, data);
+        // Implement storage or moderation here
+        break;
+      }
+      case 'block': {
+        // Optional: handle block (disconnect partner in 1-on-1 or ignore in group)
+        disconnect1v1(ws);
+        send(ws, { type: 'system', event: 'partner_disconnected', text: 'Stranger blocked.' });
+        break;
+      }
+
+      default:
+        console.warn('Unknown message type:', data.type);
     }
   });
 
-  // Handle connection close
   ws.on('close', () => {
-    console.log('User disconnected');
-
-    // Inform partner if connected
-    if (ws.partner && ws.partner.readyState === WebSocket.OPEN) {
-      ws.partner.send(JSON.stringify({ type: 'info', message: 'Your chat partner left.' }));
-      ws.partner.partner = null;
-    }
-
-    // If user was waiting, remove them from waiting queue
-    if (waitingUser === ws) {
-      waitingUser = null;
-    }
+    // Clean up 1-on-1 pairing
+    disconnect1v1(ws);
+    // Remove from group if in any
+    leaveGroup(ws);
+    userMeta.delete(ws);
+    if (waitingUser === ws) waitingUser = null;
   });
 
-  // Ping-pong to keep connection alive
-  ws.isAlive = true;
-  ws.on('pong', () => {
-    ws.isAlive = true;
+  ws.on('error', () => {
+    disconnect1v1(ws);
+    leaveGroup(ws);
+    userMeta.delete(ws);
+    if (waitingUser === ws) waitingUser = null;
   });
 });
 
-// Ping all clients every 30 seconds to keep connection alive
-const interval = setInterval(() => {
-  wss.clients.forEach((ws) => {
-    if (!ws.isAlive) return ws.terminate();
-
-    ws.isAlive = false;
-    ws.ping();
-  });
-}, 30000);
-
-// Start server
+const PORT = process.env.PORT || 4005;
 server.listen(PORT, () => {
-  console.log(`BRO-CHATT running at http://localhost:${PORT}`);
+  console.log(`✅ Bro‑Chat server running on http://localhost:${PORT}`);
 });

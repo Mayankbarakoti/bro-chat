@@ -2,424 +2,278 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bro-Chat 💀 - Live Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bro‑Chat 💀 - Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    /* Basic clean styling */
+    * {margin: 0; padding: 0; box-sizing: border-box;}
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #2c3e50, #4ca1af);
-      color: #eee;
-      margin: 0; padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ffe9e9, #fefefe);
       height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(to bottom, #ff4d4d, #a833ff);
+      color: white;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    header {
-      background: #111;
-      padding: 1rem;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    .sidebar h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
     }
-    #chatWindow {
+    .sidebar .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .sidebar button {
+      background: white;
+      color: #a833ff;
+      font-weight: bold;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .sidebar button:hover {
+      background: #ffe4e4;
+    }
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: relative;
+    }
+    .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 1rem;
-      background: rgba(0, 0, 0, 0.3);
-      border-top: 2px solid #00bcd4;
-      border-bottom: 2px solid #00bcd4;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
     .message {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 15px;
-      max-width: 80%;
+      max-width: 75%;
     }
-    .message.sent {
+    .message.user {
       flex-direction: row-reverse;
-      margin-left: auto;
+      align-self: flex-end;
     }
     .avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      margin: 0 10px;
       object-fit: cover;
-      border: 2px solid #00bcd4;
+      margin: 0 10px;
+      flex-shrink: 0;
     }
-    .message-content {
-      background: rgba(0, 188, 212, 0.3);
-      padding: 10px 15px;
-      border-radius: 15px;
-      position: relative;
-      color: #fff;
-      word-wrap: break-word;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    .bubble {
+      background: #eee;
+      padding: 12px 18px;
+      border-radius: 18px;
+      font-size: 14px;
+      word-break: break-word;
     }
-    .message.sent .message-content {
-      background: rgba(76, 175, 80, 0.7);
-    }
-    .name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #a0e7ff;
-    }
-    .message-info {
-      font-size: 0.7rem;
-      text-align: right;
-      margin-top: 3px;
-      color: #ccc;
-    }
-    form {
-      display: flex;
-      padding: 1rem;
-      background: #111;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.7);
-    }
-    #messageInput {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border-radius: 30px;
-      border: none;
-      outline: none;
-      margin-right: 10px;
-    }
-    button {
-      background: #00bcd4;
-      border: none;
+    .user .bubble {
+      background: #cc2b2b;
       color: white;
-      padding: 0 20px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
     }
-    button:hover {
-      background: #0097a7;
+    .bubble::before {
+      content: attr(data-name);
+      display: block;
+      font-size: 11px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 2px;
     }
-    #actions {
+    .user .bubble::before {
+      color: #ffe;
+    }
+    .system-msg {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .typing {
+      font-size: 13px;
+      color: gray;
+      margin-left: 55px;
+      margin-bottom: 10px;
+      display: none;
+      font-style: italic;
+    }
+    .chat-input {
       display: flex;
-      justify-content: center;
-      gap: 15px;
-      padding: 0.5rem 0 1rem 0;
-      background: #111;
+      gap: 10px;
     }
-    #actions button {
-      flex: none;
-      width: 120px;
+    .chat-input input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 25px;
+      border: 1px solid #aaa;
+      outline: none;
+      font-size: 14px;
     }
-    /* Scrollbar styling */
-    #chatWindow::-webkit-scrollbar {
-      width: 8px;
+    .chat-input button {
+      padding: 12px 20px;
+      border-radius: 25px;
+      border: none;
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
     }
-    #chatWindow::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    #chatWindow::-webkit-scrollbar-thumb {
-      background: #00bcd4;
-      border-radius: 10px;
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
     }
   </style>
 </head>
 <body>
-  <header>Bro-Chat 💀 - Live Stranger Chat</header>
-
-  <div id="chatWindow" aria-live="polite" aria-label="Chat messages">
-    <!-- Messages will appear here -->
+  <div class="sidebar">
+    <div>
+      <h2>Bro‑Chat 💀</h2>
+      <div class="menu">
+        <button onclick="newChat()">🔄 New Chat</button>
+        <button onclick="endChat()">❌ Leave</button>
+        <button onclick="location.href='chat-group.html'">🧑‍🤝‍🧑 Group Chat</button>
+        <button onclick="alert('Coming Soon!')">🎤 Voice (Soon)</button>
+        <button onclick="alert('Coming Soon!')">🎭 Themes (Soon)</button>
+      </div>
+    </div>
+    <small>Anonymous 1-on-1 Chat</small>
   </div>
 
-  <form id="messageForm" autocomplete="off" aria-label="Send message form">
-    <input
-      id="messageInput"
-      type="text"
-      placeholder="Type your message..."
-      aria-required="true"
-      aria-label="Message input"
-      autocomplete="off"
-    />
-    <button type="submit" aria-label="Send message">Send</button>
-  </form>
-
-  <div id="actions">
-    <button id="newChatBtn" aria-label="Start a new chat">New Chat</button>
-    <button id="leaveChatBtn" aria-label="Leave chat">Leave Chat</button>
+  <div class="chat-area">
+    <div class="messages" id="chatBox"></div>
+    <div class="typing" id="typingIndicator">Stranger is typing...</div>
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
 
   <script>
-    // Load profile from localStorage
-    const profileData = JSON.parse(localStorage.getItem('brochatProfile'));
-    if (!profileData) {
-      alert('Profile not found. Redirecting to profile setup.');
-      window.location.href = 'profile.html';
+    const chatBox = document.getElementById('chatBox');
+    const input = document.getElementById('messageInput');
+    const typing = document.getElementById('typingIndicator');
+
+    const profile = JSON.parse(localStorage.getItem('brochatProfile')) || {};
+    const nick = profile.nickname || 'Anonymous';
+    const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
+
+    let strangerTypingTimeout;
+
+    function appendMsg(nickname, avatarUrl, text, isMe = false) {
+      const msg = document.createElement('div');
+      msg.className = 'message ' + (isMe ? 'user' : 'stranger');
+      msg.innerHTML = `
+        <img class="avatar" src="${avatarUrl}" alt="${nickname}" />
+        <div class="bubble" data-name="${nickname}">${text}</div>
+      `;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    const chatWindow = document.getElementById('chatWindow');
-    const messageForm = document.getElementById('messageForm');
-    const messageInput = document.getElementById('messageInput');
-    const leaveChatBtn = document.getElementById('leaveChatBtn');
-    const newChatBtn = document.getElementById('newChatBtn');
-
-    // Message statuses
-    const STATUS = {
-      SENT: 'sent',
-      DELIVERED: 'delivered',
-      READ: 'read'
-    };
-
-    let socket;
-    let connected = false;
-    let messages = [];
-
-    // Create a chat message element
-    function createMessageElement(message) {
-      const div = document.createElement('div');
-      div.classList.add('message');
-      div.classList.add(message.sender === 'me' ? 'sent' : 'received');
-
-      // Avatar
-      const avatar = document.createElement('img');
-      avatar.classList.add('avatar');
-      avatar.src = message.sender === 'me' ? profileData.avatar : (message.avatar || 'https://i.ibb.co/8g5j2Nm/flash.png');
-      avatar.alt = message.sender === 'me' ? profileData.nickname : (message.name || 'Stranger');
-      div.appendChild(avatar);
-
-      // Content container
-      const content = document.createElement('div');
-      content.classList.add('message-content');
-
-      // Name
-      const nameEl = document.createElement('div');
-      nameEl.classList.add('name');
-      nameEl.textContent = message.sender === 'me' ? profileData.nickname : (message.name || 'Stranger');
-      content.appendChild(nameEl);
-
-      // Text
-      const textEl = document.createElement('div');
-      textEl.textContent = message.text;
-      content.appendChild(textEl);
-
-      // Message info - ticks for sent messages
-      const info = document.createElement('div');
-      info.classList.add('message-info');
-
-      if (message.sender === 'me') {
-        // Simple tick icon
-        const tickIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        tickIcon.setAttribute('class', 'ticks');
-        tickIcon.setAttribute('viewBox', '0 0 24 24');
-        tickIcon.setAttribute('aria-hidden', 'true');
-        tickIcon.style.width = '16px';
-        tickIcon.style.height = '16px';
-        tickIcon.innerHTML = `<path d="M1.5 12l5 5L21 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
-
-        if (message.status === STATUS.SENT) {
-          tickIcon.style.color = 'white';
-        } else if (message.status === STATUS.DELIVERED) {
-          tickIcon.style.color = '#00bcd4';
-        } else if (message.status === STATUS.READ) {
-          tickIcon.style.color = '#4caf50';
-        }
-        info.appendChild(tickIcon);
-      }
-
-      content.appendChild(info);
-      div.appendChild(content);
-
-      return div;
+    function addSys(text) {
+      const sysMsg = document.createElement('div');
+      sysMsg.className = 'system-msg';
+      sysMsg.textContent = text;
+      chatBox.appendChild(sysMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Append message to chat window
-    function appendMessage(message) {
-      const msgEl = createMessageElement(message);
-      chatWindow.appendChild(msgEl);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+    function showTyping() {
+      typing.style.display = 'block';
+      clearTimeout(strangerTypingTimeout);
+      strangerTypingTimeout = setTimeout(() => {
+        typing.style.display = 'none';
+      }, 2000);
     }
 
-    // Connect to WebSocket server
-    function connectSocket() {
-      socket = new WebSocket('ws://localhost:3000'); // Change to your backend address if needed
+    const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+    const socket = new WebSocket(`${protocol}://${location.host}`);
 
-      socket.addEventListener('open', () => {
-        console.log('Connected to chat server');
-        connected = true;
+    socket.addEventListener('open', () => {
+      socket.send(JSON.stringify({ type: 'join1v1', nickname: nick, avatar }));
+      addSys('Connecting to stranger...');
+    });
 
-        // Send join message with profile info for matchmaking
-        socket.send(JSON.stringify({
-          type: 'join',
-          nickname: profileData.nickname,
-          avatar: profileData.avatar
-        }));
-
-        // Inform user
-        appendMessage({
-          sender: 'other',
-          text: 'Searching for a stranger to chat with...',
-          status: STATUS.READ,
-          avatar: '',
-          name: 'System'
-        });
-      });
-
-      socket.addEventListener('message', event => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === 'message') {
-          // Incoming message from stranger
-          const incomingMsg = {
-            sender: 'other',
-            text: data.text,
-            status: STATUS.READ,
-            avatar: data.avatar,
-            name: data.nickname
-          };
-          messages.push(incomingMsg);
-          appendMessage(incomingMsg);
-
-          // Optionally, send read receipt
-          socket.send(JSON.stringify({ type: 'read_receipt', messageId: data.messageId || null }));
-        } 
-        else if (data.type === 'system') {
-          // System notifications
-          if (data.event === 'partner_connected') {
-            appendMessage({
-              sender: 'other',
-              text: 'Stranger connected! Say hi 👋',
-              status: STATUS.READ,
-              avatar: '',
-              name: 'System'
-            });
-          } 
-          else if (data.event === 'partner_disconnected') {
-            appendMessage({
-              sender: 'other',
-              text: 'Stranger disconnected.',
-              status: STATUS.READ,
-              avatar: '',
-              name: 'System'
-            });
-          }
-          else if(data.event === 'no_partner_found'){
-            appendMessage({
-              sender: 'other',
-              text: 'No stranger found currently. Please try again.',
-              status: STATUS.READ,
-              avatar: '',
-              name: 'System'
-            });
-          }
-        } 
-        else if (data.type === 'status_update') {
-          // Update message status if needed
-        }
-      });
-
-      socket.addEventListener('close', () => {
-        console.log('Disconnected from chat server');
-        connected = false;
-        appendMessage({
-          sender: 'other',
-          text: 'Disconnected from chat server.',
-          status: STATUS.READ,
-          avatar: '',
-          name: 'System'
-        });
-      });
-
-      socket.addEventListener('error', (err) => {
-        console.error('WebSocket error:', err);
-        alert('Connection error. Please reload the page.');
-      });
-    }
-
-    // Send chat message
-    function sendMessage(text) {
-      if (!connected) {
-        alert('Not connected to the server.');
+    socket.addEventListener('message', (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        console.warn('Invalid JSON:', event.data);
         return;
       }
 
-      // Prepare message to send
-      const msgObj = {
-        type: 'message',
-        text: text,
-        nickname: profileData.nickname,
-        avatar: profileData.avatar
-      };
-
-      socket.send(JSON.stringify(msgObj));
-
-      // Append locally with SENT status
-      const localMsg = {
-        sender: 'me',
-        text,
-        status: STATUS.SENT
-      };
-      messages.push(localMsg);
-      appendMessage(localMsg);
-    }
-
-    // Leave chat
-    function leaveChat() {
-      if (connected && socket) {
-        socket.close();
+      switch(data.type) {
+        case 'system':
+          if (data.event === 'partner_connected') addSys('Stranger connected! Say hi 👋');
+          else if (data.event === 'waiting') addSys('Waiting for a stranger to connect...');
+          else if (data.event === 'partner_left') addSys('Stranger disconnected.');
+          break;
+        case 'message1v1':
+          appendMsg(data.nickname, data.avatar, data.text, false);
+          break;
+        case 'typing1v1':
+          showTyping();
+          break;
+        default:
+          console.log('Unknown message type:', data);
       }
-      window.location.href = 'profile.html';
-    }
+    });
 
-    // Start new chat
-    function newChat() {
-      if (connected && socket) {
-        socket.send(JSON.stringify({ type: 'new_chat' }));
-      }
-      messages = [];
-      chatWindow.innerHTML = '';
-      appendMessage({
-        sender: 'other',
-        text: 'Searching for a new stranger...',
-        status: STATUS.READ,
-        avatar: '',
-        name: 'System'
-      });
-    }
-
-    // Init on page load
-    connectSocket();
-
-    // Form submission - send message
-    messageForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = messageInput.value.trim();
+    function sendMessage() {
+      const text = input.value.trim();
       if (!text) return;
-      sendMessage(text);
-      messageInput.value = '';
-      messageInput.focus();
-    });
+      appendMsg(nick, avatar, text, true);
+      socket.send(JSON.stringify({ type: 'message1v1', text }));
+      input.value = '';
+    }
 
-    // Leave chat button
-    leaveChatBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to leave the chat?')) {
-        leaveChat();
+    input.addEventListener('input', () => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'typing1v1' }));
       }
     });
 
-    // New chat button
-    newChatBtn.addEventListener('click', () => {
-      if (confirm('Start a new chat? Current messages will be cleared.')) {
-        newChat();
+    function newChat() {
+      socket.send(JSON.stringify({ type: 'new1v1' }));
+      chatBox.innerHTML = '';
+      addSys('Connecting to new stranger...');
+    }
+
+    function endChat() {
+      if (confirm('Leave the chat?')) {
+        socket.send(JSON.stringify({ type: 'leave1v1' }));
+        chatBox.innerHTML = '';
+        addSys('You left the chat.');
+      }
+    }
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
       }
     });
 
-    // ESC key to leave chat
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        leaveChatBtn.click();
-      }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') endChat();
     });
   </script>
 </body>
