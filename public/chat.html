@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <title>Bro‑Chat 💀 - Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
-    * {margin: 0; padding: 0; box-sizing: border-box;}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #ffe9e9, #fefefe);
@@ -23,10 +23,7 @@
       flex-direction: column;
       justify-content: space-between;
     }
-    .sidebar h2 {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
+    .sidebar h2 { font-size: 22px; margin-bottom: 10px; }
     .sidebar .menu {
       display: flex;
       flex-direction: column;
@@ -42,24 +39,25 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .sidebar button:hover {
-      background: #ffe4e4;
-    }
+    .sidebar button:hover { background: #ffe4e4; }
+
     .chat-area {
       flex: 1;
       display: flex;
       flex-direction: column;
       padding: 20px;
       position: relative;
+      padding-bottom: 80px; /* space for input box */
     }
+
     .messages {
       flex: 1;
       overflow-y: auto;
-      margin-bottom: 20px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
+
     .message {
       display: flex;
       align-items: flex-start;
@@ -96,9 +94,8 @@
       color: #555;
       margin-bottom: 2px;
     }
-    .user .bubble::before {
-      color: #ffe;
-    }
+    .user .bubble::before { color: #ffe; }
+
     .system-msg {
       text-align: center;
       color: #666;
@@ -114,10 +111,20 @@
       display: none;
       font-style: italic;
     }
+
     .chat-input {
+      position: fixed;
+      bottom: 0;
+      left: 240px;
+      right: 0;
+      background: #fff;
+      padding: 10px 20px;
       display: flex;
       gap: 10px;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+      z-index: 100;
     }
+
     .chat-input input {
       flex: 1;
       padding: 12px 16px;
@@ -126,6 +133,7 @@
       outline: none;
       font-size: 14px;
     }
+
     .chat-input button {
       padding: 12px 20px;
       border-radius: 25px;
@@ -136,12 +144,15 @@
       cursor: pointer;
       font-size: 14px;
     }
+
     @media (max-width: 768px) {
       .sidebar { display: none; }
+      .chat-input { left: 0; }
     }
   </style>
 </head>
 <body>
+
   <div class="sidebar">
     <div>
       <h2>Bro‑Chat 💀</h2>
@@ -159,10 +170,11 @@
   <div class="chat-area">
     <div class="messages" id="chatBox"></div>
     <div class="typing" id="typingIndicator">Stranger is typing...</div>
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
-      <button onclick="sendMessage()">Send</button>
-    </div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
+    <button onclick="sendMessage()">Send</button>
   </div>
 
   <script>
