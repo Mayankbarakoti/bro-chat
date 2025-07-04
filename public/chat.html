@@ -5,15 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
   <title>Bro‑Chat 💀 - Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <meta name="theme-color" content="#ff4d4d">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ffe9e9, #fefefe);
+      background: linear-gradient(-45deg, #fbc2eb, #a6c1ee, #fbc2eb, #a6c1ee);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
       height: 100vh;
       display: flex;
       overflow: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .sidebar {
@@ -24,19 +35,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: 0.3s ease;
     }
+    .sidebar.hidden { display: none; }
 
-    .sidebar h2 {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
-
-    .sidebar .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
+    .sidebar h2 { font-size: 22px; margin-bottom: 10px; }
+    .sidebar .menu { display: flex; flex-direction: column; gap: 12px; }
     .sidebar button {
       background: white;
       color: #a833ff;
@@ -47,9 +51,19 @@
       cursor: pointer;
       transition: 0.2s;
     }
+    .sidebar button:hover { background: #ffe4e4; }
 
-    .sidebar button:hover {
-      background: #ffe4e4;
+    #toggleMenu {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+      font-size: 20px;
+      background: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     .chat-area {
@@ -58,7 +72,18 @@
       flex-direction: column;
       padding: 20px;
       position: relative;
-      padding-bottom: 90px; /* increased for spacing */
+      overflow: hidden;
+    }
+
+    .profile-header {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      color: #333;
     }
 
     .messages {
@@ -67,6 +92,9 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      max-height: calc(100vh - 100px);
+      padding-bottom: 10px;
+      margin-top: 40px;
     }
 
     .message {
@@ -95,13 +123,11 @@
       border-radius: 18px;
       font-size: 14px;
       word-break: break-word;
+      position: relative;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
 
-    .user .bubble {
-      background: #cc2b2b;
-      color: white;
-    }
-
+    .user .bubble { background: #cc2b2b; color: white; }
     .bubble::before {
       content: attr(data-name);
       display: block;
@@ -110,9 +136,13 @@
       color: #555;
       margin-bottom: 2px;
     }
+    .user .bubble::before { color: #ffe; }
 
-    .user .bubble::before {
-      color: #ffe;
+    .bubble .time {
+      font-size: 10px;
+      color: #888;
+      text-align: right;
+      margin-top: 4px;
     }
 
     .system-msg {
@@ -124,25 +154,42 @@
     }
 
     .typing {
+      position: absolute;
+      top: 0;
+      left: 240px;
+      right: 0;
+      padding: 4px 10px;
+      background: #fffbe6;
       font-size: 13px;
-      color: gray;
-      margin-left: 55px;
-      margin-bottom: 10px;
+      color: #555;
       display: none;
       font-style: italic;
     }
 
+    .typing .dots span {
+      animation: blink 1.2s infinite;
+    }
+    .typing .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0; }
+      40% { opacity: 1; }
+    }
+
     .chat-input {
       position: fixed;
-      bottom: 10px; /* moved up slightly */
+      bottom: 0;
       left: 240px;
       right: 0;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(10px);
       padding: 10px 20px;
       display: flex;
       gap: 10px;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
       z-index: 100;
+      border-top: 1px solid rgba(255,255,255,0.2);
     }
 
     .chat-input input {
@@ -165,21 +212,40 @@
       font-size: 14px;
     }
 
+    #scrollBtn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      display: none;
+      font-size: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+      z-index: 101;
+    }
+
     @media (max-width: 768px) {
       .sidebar { display: none; }
-      .chat-input { left: 0; bottom: 10px; }
+      .chat-input { left: 0; right: 0; }
+      .messages { max-height: calc(100vh - 100px); }
+      .typing { left: 0; }
     }
   </style>
 </head>
 <body>
-
-  <div class="sidebar">
+  <button id="toggleMenu">☰</button>
+  <div class="sidebar" id="sidebar">
     <div>
       <h2>Bro‑Chat 💀</h2>
       <div class="menu">
         <button onclick="newChat()">🔄 New Chat</button>
         <button onclick="endChat()">❌ Leave</button>
-        <button onclick="location.href='chat-group.html'">🧑‍🤝‍🧑 Group Chat</button>
+        <button onclick="location.href='chat-group.html'">🢑 Group Chat</button>
         <button onclick="alert('Coming Soon!')">🎤 Voice (Soon)</button>
         <button onclick="alert('Coming Soon!')">🎭 Themes (Soon)</button>
       </div>
@@ -188,35 +254,53 @@
   </div>
 
   <div class="chat-area">
+    <div class="profile-header">
+      <img id="userAvatar" class="avatar" />
+      <span id="userNick"></span>
+    </div>
+    <div class="typing" id="typingIndicator">Stranger is typing<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
     <div class="messages" id="chatBox"></div>
-    <div class="typing" id="typingIndicator">Stranger is typing...</div>
   </div>
 
   <div class="chat-input">
     <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
-    <button onclick="sendMessage()">Send</button>
+    <button onclick="sendMessage()">📩</button>
   </div>
+  <button id="scrollBtn" onclick="scrollToBottom()">⬇️</button>
+
+  <audio id="sendSound" src="https://assets.mixkit.co/sfx/download/mixkit-clear-interface-notification-259.wav" preload="auto"></audio>
+<audio id="receiveSound" src="https://assets.mixkit.co/sfx/download/mixkit-message-pop-2484.mp3" preload="auto"></audio>
+
 
   <script>
     const chatBox = document.getElementById('chatBox');
     const input = document.getElementById('messageInput');
     const typing = document.getElementById('typingIndicator');
+    const sendSound = document.getElementById('sendSound');
+    const receiveSound = document.getElementById('receiveSound');
+    const scrollBtn = document.getElementById('scrollBtn');
 
     const profile = JSON.parse(localStorage.getItem('brochatProfile')) || {};
     const nick = profile.nickname || 'Anonymous';
     const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
 
+    document.getElementById('userNick').textContent = nick;
+    document.getElementById('userAvatar').src = avatar;
+
     let strangerTypingTimeout;
 
     function appendMsg(nickname, avatarUrl, text, isMe = false) {
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const msg = document.createElement('div');
       msg.className = 'message ' + (isMe ? 'user' : 'stranger');
       msg.innerHTML = `
         <img class="avatar" src="${avatarUrl}" alt="${nickname}" />
-        <div class="bubble" data-name="${nickname}">${text}</div>
+        <div class="bubble" data-name="${nickname}">${text}<div class="time">${time}</div></div>
       `;
       chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+      if (!isMe) receiveSound.play();
+      else sendSound.play();
     }
 
     function addSys(text) {
@@ -224,7 +308,7 @@
       sysMsg.className = 'system-msg';
       sysMsg.textContent = text;
       chatBox.appendChild(sysMsg);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
     }
 
     function showTyping() {
@@ -256,7 +340,7 @@
         case 'system':
           if (data.event === 'partner_connected') addSys('Stranger connected! Say hi 👋');
           else if (data.event === 'waiting') addSys('Waiting for a stranger to connect...');
-          else if (data.event === 'partner_left') addSys('Stranger disconnected.');
+          else if (data.event === 'partner_left') addSys(`Stranger disconnected (Last seen: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})`);
           break;
         case 'message1v1':
           appendMsg(data.nickname, data.avatar, data.text, false);
@@ -283,6 +367,17 @@
       }
     });
 
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') endChat();
+    });
+
     function newChat() {
       socket.send(JSON.stringify({ type: 'new1v1' }));
       chatBox.innerHTML = '';
@@ -297,16 +392,20 @@
       }
     }
 
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
+    function scrollToBottom() {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') endChat();
-    });
+    chatBox.onscroll = () => {
+      scrollBtn.style.display =
+        chatBox.scrollTop + chatBox.clientHeight < chatBox.scrollHeight - 50 ? 'block' : 'none';
+    };
+
+    document.getElementById('toggleMenu').onclick = () => {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    };
+
+    window.onload = () => input.focus();
   </script>
 </body>
 </html>

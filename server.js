@@ -220,7 +220,7 @@ wss.on('connection', (ws) => {
   });
 });
 
-const PORT = process.env.PORT || 4005;
+const PORT = process.env.PORT || 4009;
 server.listen(PORT, () => {
   console.log(`✅ Bro‑Chat server running on http://localhost:${PORT}`);
 });
