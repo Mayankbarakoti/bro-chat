@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #ffe9e9, #fefefe);
@@ -14,6 +15,7 @@
       display: flex;
       overflow: hidden;
     }
+
     .sidebar {
       width: 240px;
       background: linear-gradient(to bottom, #ff4d4d, #a833ff);
@@ -23,12 +25,18 @@
       flex-direction: column;
       justify-content: space-between;
     }
-    .sidebar h2 { font-size: 22px; margin-bottom: 10px; }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
     .sidebar .menu {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
+
     .sidebar button {
       background: white;
       color: #a833ff;
@@ -39,7 +47,10 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .sidebar button:hover { background: #ffe4e4; }
+
+    .sidebar button:hover {
+      background: #ffe4e4;
+    }
 
     .chat-area {
       flex: 1;
@@ -47,7 +58,7 @@
       flex-direction: column;
       padding: 20px;
       position: relative;
-      padding-bottom: 80px; /* space for input box */
+      padding-bottom: 90px; /* increased for spacing */
     }
 
     .messages {
@@ -63,10 +74,12 @@
       align-items: flex-start;
       max-width: 75%;
     }
+
     .message.user {
       flex-direction: row-reverse;
       align-self: flex-end;
     }
+
     .avatar {
       width: 40px;
       height: 40px;
@@ -75,6 +88,7 @@
       margin: 0 10px;
       flex-shrink: 0;
     }
+
     .bubble {
       background: #eee;
       padding: 12px 18px;
@@ -82,10 +96,12 @@
       font-size: 14px;
       word-break: break-word;
     }
+
     .user .bubble {
       background: #cc2b2b;
       color: white;
     }
+
     .bubble::before {
       content: attr(data-name);
       display: block;
@@ -94,7 +110,10 @@
       color: #555;
       margin-bottom: 2px;
     }
-    .user .bubble::before { color: #ffe; }
+
+    .user .bubble::before {
+      color: #ffe;
+    }
 
     .system-msg {
       text-align: center;
@@ -103,6 +122,7 @@
       font-size: 13px;
       margin-bottom: 10px;
     }
+
     .typing {
       font-size: 13px;
       color: gray;
@@ -114,7 +134,7 @@
 
     .chat-input {
       position: fixed;
-      bottom: 0;
+      bottom: 10px; /* moved up slightly */
       left: 240px;
       right: 0;
       background: #fff;
@@ -147,7 +167,7 @@
 
     @media (max-width: 768px) {
       .sidebar { display: none; }
-      .chat-input { left: 0; }
+      .chat-input { left: 0; bottom: 10px; }
     }
   </style>
 </head>
