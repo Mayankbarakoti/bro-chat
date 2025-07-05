@@ -37,7 +37,6 @@
       justify-content: space-between;
       transition: 0.3s ease;
     }
-
     .sidebar.hidden { display: none; }
 
     .sidebar h2 { font-size: 22px; margin-bottom: 10px; }
@@ -178,7 +177,8 @@
       40% { opacity: 1; }
     }
 
-    .chat-input {
+    /* Footer container with Leave/New Chat buttons + input + send button */
+    .chat-footer {
       position: fixed;
       bottom: 0;
       left: 240px;
@@ -194,7 +194,24 @@
       border-top: 1px solid rgba(255,255,255,0.2);
     }
 
-    .chat-input input {
+    .chat-footer button.action-btn {
+      background: #cc2b2b;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      user-select: none;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .chat-footer button.action-btn:hover {
+      background: #a02222;
+    }
+
+    .chat-footer input {
       flex: 1;
       padding: 12px 16px;
       border-radius: 25px;
@@ -203,28 +220,26 @@
       font-size: 14px;
     }
 
-    .chat-input button {
+    .chat-footer button.send-btn {
       padding: 12px 20px;
       border-radius: 25px;
       border: none;
-      font-size: 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #leaveBtn {
-      background: #ff5f5f;
-      color: white;
-    }
-
-    #sendBtn {
       background: linear-gradient(to right, #ff5f6d, #ffc371);
       color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      user-select: none;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .chat-footer button.send-btn:hover {
+      background: linear-gradient(to right, #ff3b45, #ffb347);
     }
 
     #scrollBtn {
       position: fixed;
-      bottom: 80px;
+      bottom: 70px;
       right: 20px;
       display: none;
       font-size: 20px;
@@ -241,8 +256,34 @@
 
     @media (max-width: 768px) {
       .sidebar { display: none; }
-      .chat-input { left: 0; right: 0; flex-wrap: wrap; }
-      .typing { left: 0; }
+      .chat-area {
+        padding: 20px 10px 0 10px;
+      }
+      .typing {
+        left: 0;
+      }
+      .messages {
+        max-height: calc(100vh - 120px);
+        margin-top: 40px;
+      }
+      .chat-footer {
+        left: 0;
+        right: 0;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .chat-footer button.action-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+      .chat-footer button.send-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      .chat-footer input {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
@@ -271,10 +312,12 @@
     <div class="messages" id="chatBox"></div>
   </div>
 
-  <div class="chat-input">
-    <button id="leaveBtn" onclick="endChat()">❌ Leave</button>
+  <!-- New footer with Leave, New Chat, input, send buttons all inline -->
+  <div class="chat-footer">
+    <button class="action-btn" id="leaveBtn" onclick="endChat()">❌ Leave</button>
+    <button class="action-btn" id="newBtn" onclick="newChat()" style="display:none;">🔄 New Chat</button>
     <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" />
-    <button id="sendBtn" onclick="sendMessage()">📩</button>
+    <button class="send-btn" onclick="sendMessage()">📩</button>
   </div>
 
   <button id="scrollBtn" onclick="scrollToBottom()">⬇️</button>
@@ -290,6 +333,7 @@
     const receiveSound = document.getElementById('receiveSound');
     const scrollBtn = document.getElementById('scrollBtn');
     const leaveBtn = document.getElementById('leaveBtn');
+    const newBtn = document.getElementById('newBtn');
 
     const profile = JSON.parse(localStorage.getItem('brochatProfile')) || {};
     const nick = profile.nickname || 'Anonymous';
@@ -349,12 +393,20 @@
 
       switch(data.type) {
         case 'system':
-          if (data.event === 'partner_connected') addSys('Stranger connected! Say hi 👋');
-          else if (data.event === 'waiting') addSys('Waiting for a stranger to connect...');
+          if (data.event === 'partner_connected') {
+            addSys('Stranger connected! Say hi 👋');
+            leaveBtn.style.display = 'inline-block';
+            newBtn.style.display = 'none';
+          }
+          else if (data.event === 'waiting') {
+            addSys('Waiting for a stranger to connect...');
+            leaveBtn.style.display = 'inline-block';
+            newBtn.style.display = 'none';
+          }
           else if (data.event === 'partner_left') {
             addSys(`Stranger disconnected (Last seen: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})})`);
-            leaveBtn.textContent = '🔄 New';
-            leaveBtn.onclick = newChat;
+            leaveBtn.style.display = 'none';
+            newBtn.style.display = 'inline-block';
           }
           break;
         case 'message1v1':
@@ -397,8 +449,8 @@
       socket.send(JSON.stringify({ type: 'new1v1' }));
       chatBox.innerHTML = '';
       addSys('Connecting to new stranger...');
-      leaveBtn.textContent = '❌ Leave';
-      leaveBtn.onclick = endChat;
+      leaveBtn.style.display = 'inline-block';
+      newBtn.style.display = 'none';
     }
 
     function endChat() {
@@ -406,8 +458,8 @@
         socket.send(JSON.stringify({ type: 'leave1v1' }));
         chatBox.innerHTML = '';
         addSys('You left the chat.');
-        leaveBtn.textContent = '🔄 New';
-        leaveBtn.onclick = newChat;
+        leaveBtn.style.display = 'none';
+        newBtn.style.display = 'inline-block';
       }
     }
 
