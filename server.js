@@ -34,16 +34,23 @@ function pairUsers(user1, user2) {
   send(user2, { type: 'system', event: 'partner_connected', text: 'Connected to a stranger!' });
 }
 
-// Disconnect 1-on-1 user and notify partner
+// Disconnect 1-on-1 user and notify partner properly
 function disconnect1v1(ws, notifyPartner = true) {
   const partner = pairings.get(ws);
   if (partner) {
     pairings.delete(partner);
     pairings.delete(ws);
-    if (notifyPartner) {
-      send(partner, { type: 'system', event: 'partner_disconnected', text: 'Stranger disconnected.' });
+
+    if (notifyPartner && partner.readyState === WebSocket.OPEN) {
+      // Notify partner that user left and close partner's pairing state
+      send(partner, {
+        type: 'system',
+        event: 'partner_left',
+        text: 'Stranger left the chat.',
+      });
     }
   }
+
   if (waitingUser === ws) waitingUser = null;
   userMeta.delete(ws);
 }
@@ -63,7 +70,7 @@ function leaveGroup(ws) {
     meta.group = null;
     send(ws, { type: 'system', event: 'leftGroup', text: `Left group "${groupName}"` });
   }
-  userMeta.set(ws, {...userMeta.get(ws), group: null});
+  userMeta.set(ws, { ...userMeta.get(ws), group: null });
 }
 
 wss.on('connection', (ws) => {
@@ -204,11 +211,14 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    // Clean up 1-on-1 pairing
+    // Clean up 1-on-1 pairing and notify partner
     disconnect1v1(ws);
+
     // Remove from group if in any
     leaveGroup(ws);
+
     userMeta.delete(ws);
+
     if (waitingUser === ws) waitingUser = null;
   });
 
@@ -220,7 +230,7 @@ wss.on('connection', (ws) => {
   });
 });
 
-const PORT = process.env.PORT || 4009;
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
   console.log(`✅ Bro‑Chat server running on http://localhost:${PORT}`);
 });
