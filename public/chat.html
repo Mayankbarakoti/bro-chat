@@ -28,10 +28,19 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 20px;
+      padding: 15px;
       position: relative;
       overflow-y: auto;
-      margin-bottom: 70px; /* space for footer */
+      scroll-behavior: smooth;
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 100px; /* ensures last message is fully visible */
     }
 
     .profile-header {
@@ -44,24 +53,16 @@
     }
 
     .profile-header .avatar {
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       object-fit: cover;
-    }
-
-    .messages {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      flex: 1;
-      overflow-y: auto;
     }
 
     .message {
       display: flex;
       align-items: flex-start;
-      max-width: 70%;
+      max-width: 80%;
     }
 
     .message.user {
@@ -70,21 +71,20 @@
     }
 
     .avatar {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       object-fit: cover;
-      margin: 0 10px;
+      margin: 0 8px;
       flex-shrink: 0;
     }
 
     .bubble {
       background: #ffffffcc;
-      padding: 12px 18px;
+      padding: 10px 15px;
       border-radius: 18px;
       font-size: 14px;
       word-break: break-word;
-      position: relative;
       box-shadow: 0 3px 10px rgba(0,0,0,0.15);
       color: #333;
     }
@@ -102,6 +102,7 @@
       margin-bottom: 3px;
       color: #555;
     }
+
     .user .bubble::before { color: #fff; }
 
     .bubble .time {
@@ -128,6 +129,7 @@
     .typing .dots span {
       animation: blink 1.2s infinite;
     }
+
     .typing .dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing .dots span:nth-child(3) { animation-delay: 0.4s; }
 
@@ -136,14 +138,16 @@
       40% { opacity: 1; }
     }
 
+    /* ✅ Footer fix */
     .chat-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       display: flex;
-      padding: 10px 20px;
-      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      gap: 8px;
       background: rgba(255,255,255,0.9);
       backdrop-filter: blur(10px);
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
@@ -159,7 +163,7 @@
     }
 
     .chat-footer button.send-btn {
-      padding: 12px 20px;
+      padding: 12px 16px;
       border: none;
       border-radius: 25px;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -167,13 +171,13 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
-    }
-    .chat-footer button.send-btn:hover {
-      opacity: 0.9;
+      margin-left: -5px; /* ✅ thoda left shift */
     }
 
+    .chat-footer button.send-btn:hover { opacity: 0.9; }
+
     .chat-footer button.leave-btn {
-      padding: 12px 20px;
+      padding: 12px 14px;
       border: none;
       border-radius: 25px;
       background: #ff4081;
@@ -182,10 +186,28 @@
       cursor: pointer;
       transition: 0.2s;
     }
-    .chat-footer button.leave-btn:hover {
-      opacity: 0.9;
-    }
 
+    .chat-footer button.leave-btn:hover { opacity: 0.9; }
+
+    /* ✅ Mobile adjustments */
+    @media (max-width: 600px) {
+      .chat-footer {
+        padding: 8px;
+        gap: 6px;
+      }
+
+      .chat-footer input {
+        font-size: 13px;
+        padding: 10px 12px;
+      }
+
+      .chat-footer button {
+        font-size: 13px;
+        padding: 10px 14px;
+      }
+
+      .message { max-width: 85%; }
+    }
   </style>
 </head>
 <body>
@@ -200,9 +222,9 @@
   </div>
 
   <div class="chat-footer">
-    <button class="leave-btn" onclick="endChat()">❌ Leave</button>
+    <button class="leave-btn" onclick="endChat()">❌</button>
     <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off"/>
-    <button class="send-btn" onclick="sendMessage()">📩 Send</button>
+    <button class="send-btn" onclick="sendMessage()">📩</button>
   </div>
 
   <audio id="sendSound" src="https://assets.mixkit.co/sfx/download/mixkit-clear-interface-notification-259.wav" preload="auto"></audio>
@@ -224,6 +246,13 @@
 
     let strangerTypingTimeout;
 
+    function scrollToBottom() {
+      chatBox.scrollTo({
+        top: chatBox.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+
     function appendMsg(nickname, avatarUrl, text, isMe = false) {
       const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       const msg = document.createElement('div');
@@ -233,7 +262,7 @@
         <div class="bubble" data-name="${nickname}">${text}<div class="time">${time}</div></div>
       `;
       chatBox.appendChild(msg);
-      setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+      setTimeout(scrollToBottom, 100);
       if (isMe) sendSound.play(); else receiveSound.play();
     }
 
@@ -242,7 +271,7 @@
       sysMsg.className = 'system-msg';
       sysMsg.textContent = text;
       chatBox.appendChild(sysMsg);
-      setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+      setTimeout(scrollToBottom, 100);
     }
 
     function showTyping() {

@@ -31,30 +31,16 @@ body{
   z-index:20;
 }
 .sidebar h3{font-size:20px;margin-bottom:10px;}
-.sidebar .user-info{
-  text-align:center;
-  margin-bottom:20px;
-}
+.sidebar .user-info{text-align:center;margin-bottom:20px;}
 .sidebar .user-info img{
   width:70px;height:70px;border-radius:50%;
-  border:3px solid #fff;
-  margin-bottom:8px;
+  border:3px solid #fff;margin-bottom:8px;
 }
-.sidebar .user-info div{
-  font-weight:600;
-  font-size:15px;
-  text-shadow:0 0 3px rgba(0,0,0,0.3);
-}
+.sidebar .user-info div{font-weight:600;font-size:15px;text-shadow:0 0 3px rgba(0,0,0,0.3);}
 .sidebar button{
-  padding:10px 15px;
-  border:none;
-  border-radius:25px;
-  background:#fff;
-  color:#6a11cb;
-  font-weight:600;
-  cursor:pointer;
-  margin:6px 0;
-  transition:0.2s;
+  padding:10px 15px;border:none;border-radius:25px;
+  background:#fff;color:#6a11cb;font-weight:600;
+  cursor:pointer;margin:6px 0;transition:0.2s;
 }
 .sidebar button:hover{background:#f3e7ff;}
 .sidebar small{opacity:0.8;text-align:center;display:block;margin-top:10px;}
@@ -91,7 +77,8 @@ body{
   display:flex;
   flex-direction:column;
   gap:12px;
-  padding-bottom:90px;
+  padding-bottom:100px; /* ✅ ensures last message visible */
+  scroll-behavior:smooth;
 }
 .message{
   display:flex;
@@ -99,9 +86,7 @@ body{
   gap:10px;
   max-width:80%;
 }
-.message .avatar{
-  width:40px;height:40px;border-radius:50%;object-fit:cover;
-}
+.message .avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;}
 .message .text{
   background:#ffffffcc;
   padding:12px 18px;
@@ -109,63 +94,92 @@ body{
   box-shadow:0 3px 10px rgba(0,0,0,0.15);
   font-size:14px;color:#333;word-break:break-word;
 }
-.message.user{
-  flex-direction:row-reverse;
-  align-self:flex-end;
-}
-.message.user .text{
-  background:linear-gradient(135deg,#6a11cb,#2575fc);
-  color:#fff;
-}
-.message .text strong{
-  display:block;font-size:12px;font-weight:600;margin-bottom:3px;
-}
+.message.user{flex-direction:row-reverse;align-self:flex-end;}
+.message.user .text{background:linear-gradient(135deg,#6a11cb,#2575fc);color:#fff;}
+.message .text strong{display:block;font-size:12px;font-weight:600;margin-bottom:3px;}
 .system-msg{text-align:center;color:#666;font-style:italic;font-size:13px;}
 .typing{font-style:italic;color:#555;display:none;margin:5px 0 8px;}
 
-/* Input */
+/* Input footer */
 .chat-input{
-  position:fixed;bottom:0;left:250px;right:0;
-  display:flex;gap:10px;
+  position:fixed;
+  bottom:0;
+  left:250px;
+  right:0;
+  display:flex;
+  gap:8px;
   background:rgba(255,255,255,0.9);
-  padding:10px 20px;
+  padding:10px 15px;
   box-shadow:0 -2px 10px rgba(0,0,0,0.1);
   backdrop-filter:blur(10px);
+  z-index:10;
 }
 .chat-input input{
-  flex:1;padding:12px 16px;border-radius:25px;border:1px solid #ccc;outline:none;
+  flex:1;
+  padding:12px 16px;
+  border-radius:25px;
+  border:1px solid #ccc;
+  outline:none;
+  font-size:14px;
 }
 .chat-input button{
-  padding:12px 20px;border:none;border-radius:25px;
+  padding:12px 16px;
+  border:none;
+  border-radius:25px;
   background:linear-gradient(135deg,#6a11cb,#2575fc);
-  color:white;font-weight:bold;cursor:pointer;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+  margin-left:-5px; /* ✅ slight left shift */
 }
 .chat-input button:hover{opacity:0.9;}
 
 /* Popups */
 .groups-list,.create-group-modal{
-  position:absolute;top:70px;left:50%;transform:translateX(-50%);
+  position:absolute;
+  top:70px;
+  left:50%;
+  transform:translateX(-50%);
   background:rgba(255,255,255,0.95);
-  padding:20px;border-radius:18px;box-shadow:0 4px 15px rgba(0,0,0,0.2);
-  display:none;width:320px;max-height:60vh;overflow-y:auto;z-index:15;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  display:none;
+  width:320px;
+  max-height:60vh;
+  overflow-y:auto;
+  z-index:15;
 }
 .groups-list h3,.create-group-modal h3{text-align:center;margin-bottom:10px;color:#6a11cb;font-weight:600;}
-.group-item{display:flex;justify-content:space-between;align-items:center;
+.group-item{
+  display:flex;justify-content:space-between;align-items:center;
   background:#ffffffcc;padding:8px 12px;margin-bottom:8px;border-radius:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
 .group-item button{
   background:linear-gradient(135deg,#6a11cb,#2575fc);
   color:#fff;border:none;padding:6px 10px;border-radius:10px;font-weight:600;cursor:pointer;
 }
-.create-group-modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #aaa;margin-bottom:10px;}
-.create-group-modal button{width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#6a11cb,#2575fc);color:white;font-weight:600;cursor:pointer;}
+.create-group-modal input{
+  width:100%;padding:10px;border-radius:10px;border:1px solid #aaa;margin-bottom:10px;
+}
+.create-group-modal button{
+  width:100%;padding:10px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:white;font-weight:600;cursor:pointer;
+}
 .create-group-modal button:hover{opacity:0.85;}
 
-/* Mobile responsive */
+/* ✅ Mobile adjustments */
 @media(max-width:768px){
   .sidebar{
-    position:fixed;left:-260px;top:0;bottom:0;
-    transition:0.3s;width:220px;
+    position:fixed;
+    left:-260px;
+    top:0;
+    bottom:0;
+    transition:0.3s;
+    width:220px;
   }
   .sidebar.open{left:0;}
   .chat-input{left:0;}
@@ -200,7 +214,7 @@ body{
 
   <div class="chat-input">
     <input type="text" id="messageInput" placeholder="Type your message..."/>
-    <button onclick="sendMessage()">📩 Send</button>
+    <button onclick="sendMessage()">📩</button>
   </div>
 
   <div class="groups-list" id="groupsList"><h3>Available Groups</h3></div>
@@ -223,7 +237,6 @@ const sidebar=document.getElementById("sidebar");
 const profileAvatar=document.getElementById("profileAvatar");
 const profileName=document.getElementById("profileName");
 
-// ✅ FIXED: Correct key name
 const profile=JSON.parse(localStorage.getItem("mysteryMeetProfile"))||{};
 const nick=profile.nickname||"Anonymous";
 const avatar=profile.avatar||`https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
@@ -233,6 +246,7 @@ profileName.textContent=nick;
 let currentGroup="";
 const protocol=location.protocol==="https:"?"wss":"ws";
 const socket=new WebSocket(`${protocol}://${location.host}`);
+
 socket.onopen=()=>console.log("✅ Connected to MysteryMeet server");
 
 socket.onmessage=(e)=>{
@@ -302,13 +316,14 @@ function appendMsg(nickname,avatarURL,text,isMe=false){
  div.innerHTML=`<img class="avatar" src="${avatarURL}" alt="">
  <div class="text"><strong>${nickname}</strong>${text}</div>`;
  chatBox.appendChild(div);
- chatBox.scrollTop=chatBox.scrollHeight;
+ setTimeout(()=>{chatBox.scrollTo({top:chatBox.scrollHeight,behavior:"smooth"});},100);
 }
 function addSystemMessage(t){
  const s=document.createElement("div");
  s.className="system-msg";
  s.textContent=t;
  chatBox.appendChild(s);
+ setTimeout(()=>{chatBox.scrollTo({top:chatBox.scrollHeight,behavior:"smooth"});},100);
 }
 function showTypingIndicator(sender){
  typingIndicator.textContent=`${sender} is typing...`;
@@ -320,7 +335,7 @@ function toggleMenu(){
  sidebar.classList.toggle("open");
 }
 messageInput.addEventListener("input",()=>{if(currentGroup)socket.send(JSON.stringify({type:"typingGroup"}));});
-messageInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+messageInput.addEventListener("keypress",e=>{if(e.key==="Enter"){e.preventDefault();sendMessage();}});
 window.addEventListener("keydown",e=>{
  if(e.key==="Escape"){
    groupsList.style.display="none";

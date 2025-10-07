@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profile Setup | Mystery Meet</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
@@ -15,13 +15,11 @@
       background: linear-gradient(135deg, #a8edea, #fed6e3);
       animation: gradientBG 15s ease infinite;
     }
-
     @keyframes gradientBG {
-      0% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+      0%,100% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
       25% { background: linear-gradient(135deg, #f9d6f9, #c6f7e2); }
       50% { background: linear-gradient(135deg, #fceabb, #c6f7e2); }
       75% { background: linear-gradient(135deg, #a8edea, #fdd1d1); }
-      100% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
     }
 
     /* Header */
@@ -29,18 +27,64 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 15px 40px;
+      padding: 15px 20px;
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
-    .logo { font-size: 1.8rem; font-weight: 700; color: #6a11cb; display: flex; align-items: center; gap: 6px; }
-    .logo span { font-size: 1.3rem; }
-    nav { display: flex; align-items: center; gap: 25px; }
-    nav a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.25s; }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #6a11cb;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.25s;
+    }
     nav a:hover { color: #00b894; }
+
+    /* Mobile Menu */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+    }
+    .bar {
+      width: 25px;
+      height: 3px;
+      background: #333;
+      border-radius: 2px;
+    }
+    @media (max-width: 700px) {
+      nav {
+        position: absolute;
+        top: 60px;
+        right: 10px;
+        background: white;
+        border-radius: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: none;
+      }
+      nav.show { display: flex; }
+      .menu-toggle { display: flex; }
+    }
 
     /* Container */
     .container {
@@ -55,13 +99,13 @@
 
     h1 {
       text-align: center;
-      font-size: 3rem;
+      font-size: 2.6rem;
       font-weight: 900;
       background: linear-gradient(45deg, #6a11cb, #2575fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 40px;
-      letter-spacing: 1.5px;
+      margin-bottom: 35px;
+      letter-spacing: 1.2px;
     }
 
     label {
@@ -78,34 +122,32 @@
       border: 1px solid #ccc;
       font-size: 1rem;
       background: #fafafa;
-      box-sizing: border-box;
     }
 
+    /* Avatars */
     .avatar-selection {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
       gap: 15px;
       margin-top: 10px;
-      justify-content: center;
     }
-
     .avatar {
-      width: 70px;
-      height: 70px;
+      width: 100%;
+      aspect-ratio: 1/1;
       border-radius: 50%;
       border: 3px solid transparent;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       object-fit: cover;
     }
-
-    .avatar:hover { transform: scale(1.1); }
+    .avatar:hover { transform: scale(1.08); }
     .avatar.selected { border-color: #ff4081; box-shadow: 0 0 12px #00bcd4; }
 
+    /* Gender & Hobbies */
     .gender-options, .hobby-options {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
       margin-top: 5px;
     }
 
@@ -118,7 +160,6 @@
       border: 1px solid #00bcd4;
       font-weight: 500;
     }
-
     .hobby-options input { display: none; }
     .hobby-options input:checked + label {
       background: linear-gradient(to right, #00bcd4, #ff4081);
@@ -128,19 +169,19 @@
       box-shadow: 0 0 10px rgba(255,64,129,0.3);
     }
 
+    /* Buttons */
     .chat-buttons {
       display: flex;
       justify-content: center;
       gap: 20px;
-      margin-top: 45px;
+      margin-top: 40px;
       flex-wrap: wrap;
     }
-
     .chat-btn {
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white;
-      font-size: 1.3rem;
-      padding: 15px 40px;
+      font-size: 1.2rem;
+      padding: 15px 35px;
       border: none;
       border-radius: 50px;
       cursor: pointer;
@@ -148,13 +189,12 @@
       font-weight: 700;
       box-shadow: 0 8px 20px rgba(0,123,255,0.3);
     }
-
     .chat-btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,123,255,0.4); }
 
     @media (max-width: 600px) {
-      .container { margin: 30px 15px; padding: 25px; }
-      h1 { font-size: 2.2rem; }
-      .chat-btn { width: 100%; font-size: 1.1rem; padding: 12px; }
+      .container { margin: 30px 15px; padding: 25px; border-radius: 20px; }
+      h1 { font-size: 2rem; }
+      .chat-btn { width: 100%; font-size: 1rem; padding: 12px; }
     }
   </style>
 </head>
@@ -162,7 +202,12 @@
 
 <header>
   <div class="logo">Mystery Meet <span>💬</span></div>
-  <nav>
+  <div class="menu-toggle" id="menuToggle">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+  <nav id="navMenu">
     <a href="index.html">Home</a>
     <a href="#help">Help</a>
     <a href="#privacy">Privacy</a>
@@ -229,18 +274,11 @@
       avatar.classList.add('selected');
       selectedAvatar = avatar.src;
     });
-    avatar.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        avatar.click();
-      }
-    });
   });
 
   document.getElementById('oneOnOneBtn').addEventListener('click', () => {
     saveProfileAndRedirect('chat.html');
   });
-
   document.getElementById('groupChatBtn').addEventListener('click', () => {
     saveProfileAndRedirect('chat-group.html');
   });
@@ -256,12 +294,18 @@
 
     const gender = genderInput.value;
     const hobbies = Array.from(hobbiesInputs).map(input => input.value);
-
     const profileData = { nickname, avatar: selectedAvatar, gender, hobbies };
     localStorage.setItem('mysteryMeetProfile', JSON.stringify(profileData));
 
     window.location.href = url;
   }
+
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.getElementById('navMenu');
+  menuToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('show');
+  });
 </script>
 
 </body>
