@@ -2,45 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Profile Setup | BRO-CHAT</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile Setup | Mystery Meet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #fff0f5, #ffe4e1);
-      margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif;
       color: #222;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      animation: gradientBG 15s ease infinite;
     }
+
+    @keyframes gradientBG {
+      0% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+      25% { background: linear-gradient(135deg, #f9d6f9, #c6f7e2); }
+      50% { background: linear-gradient(135deg, #fceabb, #c6f7e2); }
+      75% { background: linear-gradient(135deg, #a8edea, #fdd1d1); }
+      100% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 40px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo { font-size: 1.8rem; font-weight: 700; color: #6a11cb; display: flex; align-items: center; gap: 6px; }
+    .logo span { font-size: 1.3rem; }
+    nav { display: flex; align-items: center; gap: 25px; }
+    nav a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.25s; }
+    nav a:hover { color: #00b894; }
+
+    /* Container */
     .container {
-      max-width: 700px;
-      margin: 50px auto;
-      background-color: #fff;
+      max-width: 800px;
+      margin: 60px auto;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
       border-radius: 25px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
-      padding: 50px;
+      padding: 50px 40px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.1);
     }
+
     h1 {
       text-align: center;
       font-size: 3rem;
       font-weight: 900;
-      background: linear-gradient(to right, #ff4b2b, #8e2de2);
+      background: linear-gradient(45deg, #6a11cb, #2575fc);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
-      color: transparent;
       margin-bottom: 40px;
       letter-spacing: 1.5px;
     }
+
     label {
       display: block;
       margin: 15px 0 8px;
-      font-weight: bold;
+      font-weight: 600;
       color: #444;
     }
-    input[type="text"],
-    select {
+
+    input[type="text"], select {
       width: 100%;
       padding: 14px;
       border-radius: 12px;
@@ -49,6 +80,7 @@
       background: #fafafa;
       box-sizing: border-box;
     }
+
     .avatar-selection {
       display: flex;
       flex-wrap: wrap;
@@ -56,6 +88,7 @@
       margin-top: 10px;
       justify-content: center;
     }
+
     .avatar {
       width: 70px;
       height: 70px;
@@ -65,19 +98,17 @@
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       object-fit: cover;
     }
-    .avatar:hover {
-      transform: scale(1.1);
-    }
-    .avatar.selected {
-      border-color: #ff4081;
-      box-shadow: 0 0 10px #00bcd4;
-    }
-    .gender-options,
-    .hobby-options {
+
+    .avatar:hover { transform: scale(1.1); }
+    .avatar.selected { border-color: #ff4081; box-shadow: 0 0 12px #00bcd4; }
+
+    .gender-options, .hobby-options {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      margin-top: 5px;
     }
+
     .hobby-options label {
       background: linear-gradient(145deg, #e1f5fe, #fce4ec);
       border-radius: 20px;
@@ -87,149 +118,151 @@
       border: 1px solid #00bcd4;
       font-weight: 500;
     }
-    .hobby-options input {
-      display: none;
-    }
+
+    .hobby-options input { display: none; }
     .hobby-options input:checked + label {
       background: linear-gradient(to right, #00bcd4, #ff4081);
       color: white;
       border: none;
       font-weight: 600;
-      box-shadow: 0 0 10px rgba(255, 64, 129, 0.3);
+      box-shadow: 0 0 10px rgba(255,64,129,0.3);
     }
+
     .chat-buttons {
       display: flex;
       justify-content: center;
+      gap: 20px;
       margin-top: 45px;
+      flex-wrap: wrap;
     }
+
     .chat-btn {
-      background: linear-gradient(135deg, #ff5f6d, #ffc371);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white;
       font-size: 1.3rem;
-      padding: 15px 50px;
+      padding: 15px 40px;
       border: none;
-      border-radius: 35px;
+      border-radius: 50px;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.3s;
-      font-weight: bold;
-      box-shadow: 0 8px 20px rgba(255, 105, 135, 0.3);
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0,123,255,0.3);
     }
-    .chat-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 25px rgba(255, 64, 129, 0.4);
-    }
+
+    .chat-btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,123,255,0.4); }
+
     @media (max-width: 600px) {
-      .container {
-        margin: 30px 15px;
-        padding: 25px;
-      }
-      h1 {
-        font-size: 2.2rem;
-      }
-      .chat-btn {
-        width: 100%;
-        font-size: 1.1rem;
-        padding: 12px;
-      }
+      .container { margin: 30px 15px; padding: 25px; }
+      h1 { font-size: 2.2rem; }
+      .chat-btn { width: 100%; font-size: 1.1rem; padding: 12px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🔥 Set Up Your Profile</h1>
-    <form id="profileForm">
-      <label for="nickname">Enter Nickname</label>
-      <input type="text" id="nickname" name="nickname" required />
 
-      <label>Select Your Avatar</label>
-      <div class="avatar-selection">
-        <img src="https://i.pinimg.com/736x/40/f5/4b/40f54be3e833dd31103d4c373f881d32.jpg" class="avatar" alt="Batman" tabindex="0" />
-        <img src="https://w0.peakpx.com/wallpaper/233/587/HD-wallpaper-giga-chad-hair-memes-thumbnail.jpg" class="avatar" alt="Spiderman" tabindex="0" />
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcdbzg7-lU5n9IA-jb6vEVfVTZKu3WbeJjgQ&s" class="avatar" alt="Ironman" tabindex="0" />
-        <img src="https://wl-brightside.cf.tsp.li/resize/728x/jpg/715/9a6/44be3b5ebf84c87f359c5f79a6.jpg" class="avatar" alt="Superman" tabindex="0" />
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjW7LFGhZHts27vj2CSRV-DyLqwQkhQugRcg&s" class="avatar" alt="Thor" tabindex="0" />
-        <img src="https://i.redd.it/robert-pattinson-the-batman-3d-render-v0-mmlhzegftqhc1.jpg?width=2400&format=pjpg&auto=webp&s=caa14a8f8d217a8ac728fd788f14be16c9ca4da8" class="avatar" alt="Captain America" tabindex="0" />
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw4jMeKXT9Iz3PAPnXLdddkYkFZNF7doMruw&s" class="avatar" alt="Flash" tabindex="0" />
-        <img src="https://media.allure.com/photos/57718eb12554df47220a446a/master/pass/beauty-trends-blogs-daily-beauty-reporter-amazing-spiderman-emma-stone-makeup.jpg" class="avatar" alt="Deadpool" tabindex="0" />
-        <img src="https://heroichollywood.com/wp-content/uploads/2019/09/Black-Widow-Scarlett-Johansson.jpg" class="avatar" alt="Wolverine" tabindex="0" />
-        <img src="https://i.pinimg.com/736x/20/7d/1d/207d1df7f707d3fe249412541899a895.jpg" class="avatar" alt="Hulk" tabindex="0" />
-        <img src="https://cdn.prod.website-files.com/65b300512ced7cf5a4ad20ab/65c985868ae7dad4f604beae_650ce2573ce1729e6e1ff9ee_64f84086318057bf6ea214be_64c9ad45a269874142fe29df_6476623c9ecaea82a9a7fbf6_644f2889b9f2367f7c8a09e2_644e83739dcb8830438cfe1b_644dce576aae42c321b37781_644abac854b58f1b65b106eb_6449f4a237053f822e99d65f_64493e5ab26d896fe49908d3_6445bc9f69ddc521478d6f6c_644031391c1ddb0f1a9ebccc_Alexandra-Daddario.jpeg" class="avatar" alt="Dr Strange" tabindex="0" />
-        <img src="https://img.mensxp.com/media/content/2025/May/main-image-credit---Hania-Aamir-Instagram_6819b9278523c.jpeg" class="avatar" alt="Antman" tabindex="0" />
-      </div>
+<header>
+  <div class="logo">Mystery Meet <span>💬</span></div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="#help">Help</a>
+    <a href="#privacy">Privacy</a>
+  </nav>
+</header>
 
-      <label>Select Gender</label>
-      <div class="gender-options">
-        <label><input type="radio" name="gender" value="Male" required /> Male</label>
-        <label><input type="radio" name="gender" value="Female" /> Female</label>
-        <label><input type="radio" name="gender" value="Other" /> Other</label>
-      </div>
+<div class="container">
+  <h1>🔥 Set Up Your Profile</h1>
+  <form id="profileForm">
+    <label for="nickname">Enter Nickname</label>
+    <input type="text" id="nickname" name="nickname" required />
 
-      <label>Select Hobbies</label>
-      <div class="hobby-options">
-        <input type="checkbox" id="gaming" value="Gaming" name="hobbies" /><label for="gaming">Gaming</label>
-        <input type="checkbox" id="music" value="Music" name="hobbies" /><label for="music">Music</label>
-        <input type="checkbox" id="movies" value="Movies" name="hobbies" /><label for="movies">Movies</label>
-        <input type="checkbox" id="travel" value="Travel" name="hobbies" /><label for="travel">Travel</label>
-        <input type="checkbox" id="fitness" value="Fitness" name="hobbies" /><label for="fitness">Fitness</label>
-        <input type="checkbox" id="coding" value="Coding" name="hobbies" /><label for="coding">Coding</label>
-        <input type="checkbox" id="politics" value="Politics" name="hobbies" /><label for="politics">Politics</label>
-        <input type="checkbox" id="sports" value="Sports" name="hobbies" /><label for="sports">Sports</label>
-        <input type="checkbox" id="books" value="Books" name="hobbies" /><label for="books">Books</label>
-        <input type="checkbox" id="art" value="Art" name="hobbies" /><label for="art">Art</label>
-      </div>
+    <label>Select Your Avatar</label>
+    <div class="avatar-selection">
+      <img src="https://i.pinimg.com/736x/40/f5/4b/40f54be3e833dd31103d4c373f881d32.jpg" class="avatar" alt="Batman"/>
+      <img src="https://w0.peakpx.com/wallpaper/233/587/HD-wallpaper-giga-chad-hair-memes-thumbnail.jpg" class="avatar" alt="Spiderman"/>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcdbzg7-lU5n9IA-jb6vEVfVTZKu3WbeJjgQ&s" class="avatar" alt="Ironman"/>
+      <img src="https://wl-brightside.cf.tsp.li/resize/728x/jpg/715/9a6/44be3b5ebf84c87f359c5f79a6.jpg" class="avatar" alt="Superman"/>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjW7LFGhZHts27vj2CSRV-DyLqwQkhQugRcg&s" class="avatar" alt="Thor"/>
+      <img src="https://i.pinimg.com/736x/f1/5c/9b/f15c9bf5d01963379d7072c3b0832f81.jpg" class="avatar" alt="Captain America"/>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRw4jMeKXT9Iz3PAPnXLdddkYkFZNF7doMruw&s" class="avatar" alt="Flash"/>
+      <img src="https://media.allure.com/photos/57718eb12554df47220a446a/master/pass/beauty-trends-blogs-daily-beauty-reporter-amazing-spiderman-emma-stone-makeup.jpg" class="avatar" alt="Deadpool"/>
+      <img src="https://heroichollywood.com/wp-content/uploads/2019/09/Black-Widow-Scarlett-Johansson.jpg" class="avatar" alt="Wolverine"/>
+      <img src="https://i.pinimg.com/736x/20/7d/1d/207d1df7f707d3fe249412541899a895.jpg" class="avatar" alt="Hulk"/>
+      <img src="https://cdn.prod.website-files.com/65b300512ced7cf5a4ad20ab/65c985868ae7dad4f604beae_650ce2573ce1729e6e1ff9ee_64f84086318057bf6ea214be_64c9ad45a269874142fe29df_6476623c9ecaea82a9a7fbf6_644f2889b9f2367f7c8a09e2_644e83739dcb8830438cfe1b_644dce576aae42c321b37781_644abac854b58f1b65b106eb_6449f4a237053f822e99d65f_64493e5ab26d896fe49908d3_6445bc9f69ddc521478d6f6c_644031391c1ddb0f1a9ebccc_Alexandra-Daddario.jpeg" class="avatar" alt="Dr Strange"/>
+      <img src="https://img.mensxp.com/media/content/2025/May/main-image-credit---Hania-Aamir-Instagram_6819b9278523c.jpeg" class="avatar" alt="Antman"/>
+    </div>
 
-      <div class="chat-buttons">
-        <button type="submit" class="chat-btn">🚀 Continue to Chat</button>
-      </div>
-    </form>
-  </div>
+    <label>Select Gender</label>
+    <div class="gender-options">
+      <label><input type="radio" name="gender" value="Male" required /> Male</label>
+      <label><input type="radio" name="gender" value="Female" /> Female</label>
+      <label><input type="radio" name="gender" value="Other" /> Other</label>
+    </div>
 
-  <script>
-    const avatars = document.querySelectorAll('.avatar');
-    let selectedAvatar = null;
+    <label>Select Hobbies</label>
+    <div class="hobby-options">
+      <input type="checkbox" id="gaming" value="Gaming" name="hobbies" /><label for="gaming">Gaming</label>
+      <input type="checkbox" id="music" value="Music" name="hobbies" /><label for="music">Music</label>
+      <input type="checkbox" id="movies" value="Movies" name="hobbies" /><label for="movies">Movies</label>
+      <input type="checkbox" id="travel" value="Travel" name="hobbies" /><label for="travel">Travel</label>
+      <input type="checkbox" id="fitness" value="Fitness" name="hobbies" /><label for="fitness">Fitness</label>
+      <input type="checkbox" id="coding" value="Coding" name="hobbies" /><label for="coding">Coding</label>
+      <input type="checkbox" id="politics" value="Politics" name="hobbies" /><label for="politics">Politics</label>
+      <input type="checkbox" id="sports" value="Sports" name="hobbies" /><label for="sports">Sports</label>
+      <input type="checkbox" id="books" value="Books" name="hobbies" /><label for="books">Books</label>
+      <input type="checkbox" id="art" value="Art" name="hobbies" /><label for="art">Art</label>
+    </div>
 
-    avatars.forEach(avatar => {
-      avatar.addEventListener('click', () => {
-        avatars.forEach(a => a.classList.remove('selected'));
-        avatar.classList.add('selected');
-        selectedAvatar = avatar.src;
-      });
-      avatar.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          avatar.click();
-        }
-      });
+    <div class="chat-buttons">
+      <button type="button" class="chat-btn" id="oneOnOneBtn">🚀 1-on-1 Chat</button>
+      <button type="button" class="chat-btn" id="groupChatBtn">🌐 Group Chat</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const avatars = document.querySelectorAll('.avatar');
+  let selectedAvatar = null;
+
+  avatars.forEach(avatar => {
+    avatar.addEventListener('click', () => {
+      avatars.forEach(a => a.classList.remove('selected'));
+      avatar.classList.add('selected');
+      selectedAvatar = avatar.src;
     });
-
-    document.getElementById('profileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const nickname = document.getElementById('nickname').value.trim();
-      const genderInput = document.querySelector('input[name="gender"]:checked');
-      const hobbiesInputs = document.querySelectorAll('input[name="hobbies"]:checked');
-
-      if (!nickname) {
-        alert('Please enter a nickname.');
-        return;
+    avatar.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        avatar.click();
       }
-      if (!selectedAvatar) {
-        alert('Please select an avatar.');
-        return;
-      }
-      if (!genderInput) {
-        alert('Please select your gender.');
-        return;
-      }
-
-      const gender = genderInput.value;
-      const hobbies = Array.from(hobbiesInputs).map(input => input.value);
-
-      const profileData = { nickname, avatar: selectedAvatar, gender, hobbies };
-      localStorage.setItem('brochatProfile', JSON.stringify(profileData));
-
-      window.location.href = 'chat.html';
     });
-  </script>
+  });
+
+  document.getElementById('oneOnOneBtn').addEventListener('click', () => {
+    saveProfileAndRedirect('chat.html');
+  });
+
+  document.getElementById('groupChatBtn').addEventListener('click', () => {
+    saveProfileAndRedirect('chat-group.html');
+  });
+
+  function saveProfileAndRedirect(url) {
+    const nickname = document.getElementById('nickname').value.trim();
+    const genderInput = document.querySelector('input[name="gender"]:checked');
+    const hobbiesInputs = document.querySelectorAll('input[name="hobbies"]:checked');
+
+    if (!nickname) { alert('Please enter a nickname.'); return; }
+    if (!selectedAvatar) { alert('Please select an avatar.'); return; }
+    if (!genderInput) { alert('Please select your gender.'); return; }
+
+    const gender = genderInput.value;
+    const hobbies = Array.from(hobbiesInputs).map(input => input.value);
+
+    const profileData = { nickname, avatar: selectedAvatar, gender, hobbies };
+    localStorage.setItem('mysteryMeetProfile', JSON.stringify(profileData));
+
+    window.location.href = url;
+  }
+</script>
+
 </body>
 </html>

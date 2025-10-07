@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bro‑Chat 💀</title>
+  <title>Mystery Meet</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     * {
@@ -15,51 +15,118 @@
     body {
       font-family: 'Poppins', sans-serif;
       line-height: 1.6;
-      background: linear-gradient(135deg, #ffe9e9, #fefefe);
       color: #222;
       scroll-behavior: smooth;
+      overflow-x: hidden;
+      background: #a8edea; /* Static background for header & welcome */
     }
 
+    /* Header / Navbar */
     header {
-      background: linear-gradient(to right, #ff4d4d, #a833ff);
-      color: white;
-      padding: 60px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 40px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* Logo */
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #6a11cb; /* Stable gradient-like color */
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo span {
+      font-size: 1.3rem;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.25s;
+    }
+
+    nav a:hover {
+      color: #00b894;
+    }
+
+    /* Header Content */
+    .header-content {
       text-align: center;
+      margin: 60px 20px 80px 20px;
+      position: relative;
+      z-index: 2;
     }
 
-    header h1 {
+    .header-content h1 {
       font-size: 3rem;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      color: #333;
     }
 
-    header p {
+    .header-content p {
       font-size: 1.2rem;
       margin-bottom: 30px;
+      color: #444;
     }
 
+    /* Start Button */
     .start-btn {
-      background: linear-gradient(to right, #ff5f6d, #ffc371);
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: #fff;
       border: none;
-      padding: 14px 30px;
-      font-size: 1.1rem;
+      padding: 15px 35px;
+      font-size: 1.2rem;
+      font-weight: 700;
       border-radius: 50px;
       cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     }
 
     .start-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
     }
 
+    /* Sections Wrapper with animated gradient */
+    .sections-wrapper {
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+      25% { background: linear-gradient(135deg, #f9d6f9, #c6f7e2); }
+      50% { background: linear-gradient(135deg, #fceabb, #c6f7e2); }
+      75% { background: linear-gradient(135deg, #a8edea, #fdd1d1); }
+      100% { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+    }
+
+    /* Sections */
     .section {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      padding: 60px 20px;
+      justify-content: center;
+      padding: 70px 20px;
       gap: 30px;
       max-width: 1200px;
       margin: auto;
@@ -69,42 +136,75 @@
       flex-direction: row-reverse;
     }
 
-    .section img {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .section-content {
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      padding: 30px;
+      border-radius: 20px;
       flex: 1;
-      min-width: 280px;
+      min-width: 300px;
+      max-width: 500px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .section-content h2 {
-      color: #cc2b2b;
+    .card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card h2 {
       font-size: 2rem;
       margin-bottom: 15px;
+      background: linear-gradient(45deg, #6a5acd, #8fd3f4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .section-content p, .section-content ul {
+    .card p, .card ul {
       font-size: 1.1rem;
-      color: #444;
+      color: #333;
     }
 
-    .section-content ul {
+    .card ul {
       padding-left: 20px;
     }
 
+    .section img {
+      width: 100%;
+      max-width: 450px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .section img:hover {
+      transform: translateY(-6px) rotate(-1deg);
+    }
+
     footer {
-      background: #1f1f1f;
-      color: #eee;
+      background: #f1f1f1;
+      color: #555;
       text-align: center;
       padding: 30px 20px;
       font-size: 0.9rem;
+      border-radius: 40px 40px 0 0;
+      box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
     }
 
     @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 10px;
+      }
+      nav {
+        justify-content: center;
+        gap: 15px;
+      }
+      .header-content h1 {
+        font-size: 2.2rem;
+      }
       .section {
         flex-direction: column;
         text-align: center;
@@ -112,78 +212,93 @@
       .section.reverse {
         flex-direction: column;
       }
+      .section img {
+        margin-top: 20px;
+      }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Welcome to Bro‑Chat 💀</h1>
-    <p>Random Stranger Chat | 1-on-1 & Group Mode | No Signup | Just Vibe</p>
-    <a href="profile.html">
-      <button class="start-btn">🚀 Start Chatting</button>
-    </a>
+    <div class="logo">Mystery Meet <span>💬</span></div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#why">Why Us</a>
+      <a href="#help">Help</a>
+      <a href="profile.html"><button class="start-btn">🚀 Start Chat</button></a>
+    </nav>
   </header>
 
-  <section class="section">
-    <div class="section-content">
-      <h2>What is Bro‑Chat?</h2>
-      <p>
-        Bro‑Chat is your go-to zone to vibe with strangers when you're bored or need a real convo.
-        No filters. No signups. Just chill, connect, and talk it out like bros.
-      </p>
-    </div>
-    <img src="https://i.redd.it/ttgtdlditwl81.jpg" alt="Bro‑Chat Preview">
-  </section>
+  <div class="header-content">
+    <h1>Welcome to Mystery Meet 💬</h1>
+    <p>Random Stranger Chat | 1-on-1 & Group Mode | No Signup | Just Vibe</p>
+    <a href="profile.html"><button class="start-btn">🚀 Start Chat</button></a>
+  </div>
 
-  <section class="section reverse">
-    <div class="section-content">
-      <h2>1‑on‑1 & Group Chat</h2>
-      <p>
-        Go deep with a stranger in 1-on-1 chat or have fun with group roasts.
-        Switch modes instantly. Bro‑Chat is always ready for your vibe.
-      </p>
-    </div>
-    <img src="https://blogger.googleusercontent.com/img/a/AVvXsEi_CFdyftPCqvdfawTOH0bs7-T0BZu43edXyB-vUPn0FhdNyTqsO2SUqcR0GupsmHFI7Xb6UgoOI3Q1n1XW1T7i6gTropEo-luwE_VNcY3mE2veIS4WQ4E3dpgxTkHzVHwcC-m6xkRUbCa61ZP1Z5K5aGSf54RyMkMkxJjp05d0i1i6vcbixJUvYC4Y523i=w640-h360" alt="Group Chat">
-  </section>
+  <div class="sections-wrapper">
+    <!-- Sections -->
+    <section class="section" id="about">
+      <div class="card">
+        <h2>What is Mystery Meet?</h2>
+        <p>
+          Mystery Meet is your go-to zone to vibe with strangers when you're bored or need a real conversation.
+          No filters. No signups. Just chill, connect, and talk it out freely.
+        </p>
+      </div>
+      <img src="https://i.redd.it/ttgtdlditwl81.jpg" alt="Mystery Meet Preview">
+    </section>
 
-  <section class="section">
-    <div class="section-content">
-      <h2>Stay Private</h2>
-      <p>
-        100% Anonymous. No accounts. No tracking. Chat disappears when you're done. 
-        Just like Batman — in, out, gone. 💀🦇
-      </p>
-    </div>
-    <img src="https://media.tenor.com/N3HLnIoe81MAAAAM/thor-love-and-thunder-thor.gif" alt="Privacy">
-  </section>
+    <section class="section reverse" id="privacy">
+      <div class="card">
+        <h2>1-on-1 & Group Chat</h2>
+        <p>
+          Go deep with a stranger in 1-on-1 chat or have fun with group chats.
+          Switch modes instantly. Mystery Meet is always ready for your vibe.
+        </p>
+      </div>
+      <img src="https://blogger.googleusercontent.com/img/a/AVvXsEi_CFdyftPCqvdfawTOH0bs7-T0BZu43edXyB-vUPn0FhdNyTqsO2SUqcR0GupsmHFI7Xb6UgoOI3Q1n1XW1T7i6gTropEo-luwE_VNcY3mE2veIS4WQ4E3dpgxTkHzVHwcC-m6xkRUbCa61ZP1Z5K5aGSf54RyMkMkxJjp05d0i1i6vcbixJUvYC4Y523i=0" alt="Group Chat">
+    </section>
 
-  <section class="section reverse">
-    <div class="section-content">
-      <h2>Why Bro‑Chat?</h2>
-      <ul>
-        <li>Skip boring signups — jump in fast</li>
-        <li>Random pairing like Joingy/Omegle</li>
-        <li>Superhero-style avatars & design</li>
-        <li>Voice messages & friends list coming</li>
-        <li>Light, fast, and built for fun</li>
-      </ul>
-    </div>
-    <img src="https://i.redd.it/n1rb7351160f1.gif" alt="Why Choose">
-  </section>
+    <section class="section" id="why">
+      <div class="card">
+        <h2>Stay Private</h2>
+        <p>
+          100% Anonymous. No accounts. No tracking. Chat disappears when you're done.
+          Just like a ghost — in, out, gone.
+        </p>
+      </div>
+      <img src="https://media.tenor.com/N3HLnIoe81MAAAAM/thor-love-and-thunder-thor.gif" alt="Privacy">
+    </section>
 
-  <section class="section">
-    <div class="section-content">
-      <h2>Need Help?</h2>
-      <p>
-        Got issues? Just ping the dev squad (or summon Batman 🦇). We’re usually online unless we’re binge-watching memes.
-      </p>
-    </div>
-    <img src="https://i.pinimg.com/736x/d7/ab/60/d7ab60dfd529c728dd581891fae515fe.jpg" alt="Help Support">
-  </section>
+    <section class="section reverse">
+      <div class="card">
+        <h2>Why Mystery Meet?</h2>
+        <ul>
+          <li>Skip boring signups — jump in fast</li>
+          <li>Random pairing like Joingy/Omegle</li>
+          <li>Superhero-style avatars & design</li>
+          <li>Voice messages & friends list coming</li>
+          <li>Light, fast, and built for fun</li>
+        </ul>
+      </div>
+      <img src="https://i.redd.it/n1rb7351160f1.gif" alt="Why Choose">
+    </section>
+
+    <section class="section" id="help">
+      <div class="card">
+        <h2>Need Help?</h2>
+        <p>
+          Got issues? Just ping the dev squad. We’re usually online unless binge-watching memes.
+        </p>
+      </div>
+      <img src="https://i.pinimg.com/736x/d7/ab/60/d7ab60dfd529c728dd581891fae515fe.jpg" alt="Help Support">
+    </section>
+  </div>
 
   <footer>
-    &copy; 2025 Bro‑Chat 💀 | Built by Bros, for Bros
+    &copy; 2025 Mystery Meet | Built for fun & vibes
   </footer>
 
 </body>

@@ -1,323 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bro‑Chat 💀 - Group Chat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MysteryMeet 💬 – Group Chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Poppins',sans-serif;
+  background:linear-gradient(135deg,#a8edea,#fed6e3);
+  background-size:400% 400%;
+  animation:gradientBG 15s ease infinite;
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+}
+@keyframes gradientBG{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #ffe9e9, #fefefe);
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+/* Sidebar */
+.sidebar{
+  width:250px;
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:#fff;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  transition:0.3s;
+  z-index:20;
+}
+.sidebar h3{font-size:20px;margin-bottom:10px;}
+.sidebar .user-info{
+  text-align:center;
+  margin-bottom:20px;
+}
+.sidebar .user-info img{
+  width:70px;height:70px;border-radius:50%;
+  border:3px solid #fff;
+  margin-bottom:8px;
+}
+.sidebar .user-info div{
+  font-weight:600;
+  font-size:15px;
+  text-shadow:0 0 3px rgba(0,0,0,0.3);
+}
+.sidebar button{
+  padding:10px 15px;
+  border:none;
+  border-radius:25px;
+  background:#fff;
+  color:#6a11cb;
+  font-weight:600;
+  cursor:pointer;
+  margin:6px 0;
+  transition:0.2s;
+}
+.sidebar button:hover{background:#f3e7ff;}
+.sidebar small{opacity:0.8;text-align:center;display:block;margin-top:10px;}
 
-    .sidebar {
-      width: 240px;
-      background: linear-gradient(to bottom, #ff4d4d, #a833ff);
-      color: white;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      justify-content: space-between;
-    }
+/* Chat area */
+.chat-container{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:15px;
+  position:relative;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:rgba(255,255,255,0.8);
+  border-radius:18px;
+  padding:8px 14px;
+  margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+.topbar .mobile-menu{
+  display:none;
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:#fff;border:none;border-radius:8px;
+  padding:8px 12px;font-weight:bold;cursor:pointer;
+}
+.topbar .group-header{font-weight:600;color:#333;}
 
-    .sidebar h3 {
-      font-size: 20px;
-    }
+.messages{
+  flex:1;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding-bottom:90px;
+}
+.message{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  max-width:80%;
+}
+.message .avatar{
+  width:40px;height:40px;border-radius:50%;object-fit:cover;
+}
+.message .text{
+  background:#ffffffcc;
+  padding:12px 18px;
+  border-radius:18px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.15);
+  font-size:14px;color:#333;word-break:break-word;
+}
+.message.user{
+  flex-direction:row-reverse;
+  align-self:flex-end;
+}
+.message.user .text{
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:#fff;
+}
+.message .text strong{
+  display:block;font-size:12px;font-weight:600;margin-bottom:3px;
+}
+.system-msg{text-align:center;color:#666;font-style:italic;font-size:13px;}
+.typing{font-style:italic;color:#555;display:none;margin:5px 0 8px;}
 
-    .sidebar button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      background: white;
-      color: #a833ff;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
+/* Input */
+.chat-input{
+  position:fixed;bottom:0;left:250px;right:0;
+  display:flex;gap:10px;
+  background:rgba(255,255,255,0.9);
+  padding:10px 20px;
+  box-shadow:0 -2px 10px rgba(0,0,0,0.1);
+  backdrop-filter:blur(10px);
+}
+.chat-input input{
+  flex:1;padding:12px 16px;border-radius:25px;border:1px solid #ccc;outline:none;
+}
+.chat-input button{
+  padding:12px 20px;border:none;border-radius:25px;
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:white;font-weight:bold;cursor:pointer;
+}
+.chat-input button:hover{opacity:0.9;}
 
-    .sidebar button:hover {
-      background: #ffd1d1;
-    }
+/* Popups */
+.groups-list,.create-group-modal{
+  position:absolute;top:70px;left:50%;transform:translateX(-50%);
+  background:rgba(255,255,255,0.95);
+  padding:20px;border-radius:18px;box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  display:none;width:320px;max-height:60vh;overflow-y:auto;z-index:15;
+}
+.groups-list h3,.create-group-modal h3{text-align:center;margin-bottom:10px;color:#6a11cb;font-weight:600;}
+.group-item{display:flex;justify-content:space-between;align-items:center;
+  background:#ffffffcc;padding:8px 12px;margin-bottom:8px;border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.group-item button{
+  background:linear-gradient(135deg,#6a11cb,#2575fc);
+  color:#fff;border:none;padding:6px 10px;border-radius:10px;font-weight:600;cursor:pointer;
+}
+.create-group-modal input{width:100%;padding:10px;border-radius:10px;border:1px solid #aaa;margin-bottom:10px;}
+.create-group-modal button{width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#6a11cb,#2575fc);color:white;font-weight:600;cursor:pointer;}
+.create-group-modal button:hover{opacity:0.85;}
 
-    .chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 20px;
-      backdrop-filter: blur(6px);
-      position: relative;
-      padding-bottom: 80px; /* To leave space for fixed input */
-    }
-
-    .group-header {
-      font-weight: 600;
-      font-size: 18px;
-      color: #cc2b2b;
-      margin-bottom: 10px;
-    }
-
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .message {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      background: #f1f1f1;
-      padding: 10px 15px;
-      border-radius: 8px;
-      max-width: 70%;
-    }
-
-    .message.user {
-      background: #cc2b2b;
-      color: white;
-      align-self: flex-end;
-      flex-direction: row-reverse;
-    }
-
-    .message .avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .message .text {
-      word-break: break-word;
-      font-size: 14px;
-    }
-
-    .typing {
-      font-size: 13px;
-      color: #555;
-      margin: 5px 0;
-      display: none;
-    }
-
-    .chat-input {
-      position: fixed;
-      bottom: 0;
-      left: 240px;
-      right: 0;
-      background: #fff;
-      padding: 12px 20px;
-      display: flex;
-      gap: 10px;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-      z-index: 100;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 12px 15px;
-      border-radius: 25px;
-      border: 1px solid #aaa;
-      outline: none;
-    }
-
-    .chat-input button {
-      padding: 12px 20px;
-      border-radius: 25px;
-      border: none;
-      background: linear-gradient(to right, #ff5f6d, #ffc371);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .group-selection {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 10;
-      display: none;
-      flex-direction: column;
-      gap: 15px;
-      width: 300px;
-      text-align: center;
-    }
-
-    .group-selection input {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    .group-selection button {
-      padding: 10px;
-      border: none;
-      background: #a833ff;
-      color: white;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
-      .chat-input {
-        left: 0;
-      }
-    }
-  </style>
+/* Mobile responsive */
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;left:-260px;top:0;bottom:0;
+    transition:0.3s;width:220px;
+  }
+  .sidebar.open{left:0;}
+  .chat-input{left:0;}
+  .topbar .mobile-menu{display:block;}
+}
+</style>
 </head>
 <body>
 
-  <div class="sidebar">
-    <div>
-      <h3>Group Options</h3>
-      <button onclick="openGroupSelection()">🔗 Join/Create Group</button>
-      <button onclick="leaveGroup()">❌ Leave Group</button>
-      <button onclick="newGroup()">🔄 New Group</button>
+<div class="sidebar" id="sidebar">
+  <div>
+    <div class="user-info">
+      <img id="profileAvatar" src="" alt="avatar"/>
+      <div id="profileName">Anonymous</div>
     </div>
-    <small>Anonymous Group Chat 💀</small>
+    <h3>Groups</h3>
+    <button onclick="openGroupsList()">📜 Join Group</button>
+    <button onclick="openCreateGroup()">➕ Create Group</button>
+    <button onclick="leaveGroup()">❌ Leave Group</button>
   </div>
+  <small>MysteryMeet 💬</small>
+</div>
 
-  <div class="chat-container">
+<div class="chat-container">
+  <div class="topbar">
+    <button class="mobile-menu" onclick="toggleMenu()">☰</button>
     <div class="group-header" id="groupTitle">Not in a group yet</div>
-
-    <div class="messages" id="chatBox"></div>
-
-    <div class="typing" id="typingIndicator">Someone is typing...</div>
-
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
-
-    <div class="group-selection" id="groupModal">
-      <h3>Join or Create a Group</h3>
-      <input type="text" id="groupInput" placeholder="Enter group name..." />
-      <button onclick="joinGroup()">Enter Group</button>
-    </div>
   </div>
 
-  <script>
-    const chatBox = document.getElementById("chatBox");
-    const messageInput = document.getElementById("messageInput");
-    const groupTitle = document.getElementById("groupTitle");
-    const groupModal = document.getElementById("groupModal");
-    const groupInput = document.getElementById("groupInput");
-    const typingIndicator = document.getElementById("typingIndicator");
+  <div class="messages" id="chatBox"></div>
+  <div class="typing" id="typingIndicator">Someone is typing...</div>
 
-    const profile = JSON.parse(localStorage.getItem("brochatProfile")) || {};
-    const nick = profile.nickname || "Anonymous";
-    const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
+  <div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type your message..."/>
+    <button onclick="sendMessage()">📩 Send</button>
+  </div>
 
-    let currentGroup = "";
-    const protocol = location.protocol === "https:" ? "wss" : "ws";
-    const socket = new WebSocket(`${protocol}://${location.host}`);
+  <div class="groups-list" id="groupsList"><h3>Available Groups</h3></div>
 
-    socket.onopen = () => console.log("Connected to WebSocket");
+  <div class="create-group-modal" id="createGroupModal">
+    <h3>Create New Group</h3>
+    <input type="text" id="newGroupName" placeholder="Enter group name..."/>
+    <button onclick="createNewGroup()">✅ Create</button>
+  </div>
+</div>
 
-    socket.onmessage = (e) => {
-      const d = JSON.parse(e.data);
-      if (d.type === "system") {
-        if (d.event === "joinedGroup") addSystemMessage(`🔒 Joined ${d.group}`);
-        if (d.event === "leftGroup") addSystemMessage(`🚪 Left group`);
-      }
-      if (d.type === "messageGroup") appendGroupMsg(d.nickname, d.avatar, d.text);
-      if (d.type === "typingGroup") showTypingIndicator(d.nickname);
-    };
+<script>
+const chatBox=document.getElementById("chatBox");
+const messageInput=document.getElementById("messageInput");
+const groupTitle=document.getElementById("groupTitle");
+const groupsList=document.getElementById("groupsList");
+const createGroupModal=document.getElementById("createGroupModal");
+const typingIndicator=document.getElementById("typingIndicator");
+const sidebar=document.getElementById("sidebar");
+const profileAvatar=document.getElementById("profileAvatar");
+const profileName=document.getElementById("profileName");
 
-    function openGroupSelection() {
-      groupModal.style.display = "flex";
-    }
+// ✅ FIXED: Correct key name
+const profile=JSON.parse(localStorage.getItem("mysteryMeetProfile"))||{};
+const nick=profile.nickname||"Anonymous";
+const avatar=profile.avatar||`https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
+profileAvatar.src=avatar;
+profileName.textContent=nick;
 
-    function joinGroup() {
-      const groupName = groupInput.value.trim();
-      if (!groupName) return;
-      currentGroup = groupName;
-      groupTitle.textContent = `Group: ${groupName}`;
-      groupModal.style.display = "none";
-      chatBox.innerHTML = "";
-      socket.send(JSON.stringify({ type: "joinGroup", group: groupName, nickname: nick, avatar }));
-    }
+let currentGroup="";
+const protocol=location.protocol==="https:"?"wss":"ws";
+const socket=new WebSocket(`${protocol}://${location.host}`);
+socket.onopen=()=>console.log("✅ Connected to MysteryMeet server");
 
-    function leaveGroup() {
-      if (confirm("Leave the current group?")) {
-        socket.send(JSON.stringify({ type: "leaveGroup" }));
-        currentGroup = "";
-        groupTitle.textContent = "Not in a group yet";
-        chatBox.innerHTML = "";
-      }
-    }
+socket.onmessage=(e)=>{
+ const d=JSON.parse(e.data);
+ if(d.type==="system"){
+   if(d.event==="joinedGroup") addSystemMessage(`🔒 Joined ${d.group}`);
+   if(d.event==="leftGroup") addSystemMessage(`🚪 Left group`);
+ }
+ if(d.type==="messageGroup") appendMsg(d.nickname,d.avatar,d.text);
+ if(d.type==="typingGroup") showTypingIndicator(d.nickname);
+ if(d.type==="groupsData"){
+   groupsList.innerHTML='<h3>Available Groups</h3>';
+   d.groups.forEach(g=>{
+     const div=document.createElement("div");
+     div.className="group-item";
+     div.innerHTML=`<span>${g.name} (${g.users.length} users)</span>
+       <button onclick="joinExistingGroup('${g.name}')">Join</button>`;
+     groupsList.appendChild(div);
+   });
+ }
+};
 
-    function newGroup() {
-      leaveGroup();
-      openGroupSelection();
-    }
-
-    function sendMessage() {
-      const msg = messageInput.value.trim();
-      if (!msg) return;
-      appendGroupMsg(nick, avatar, msg, true);
-      socket.send(JSON.stringify({ type: "messageGroup", text: msg }));
-      messageInput.value = "";
-    }
-
-    function appendGroupMsg(nickname, avatarURL, text, isMe = false) {
-      const msgDiv = document.createElement("div");
-      msgDiv.className = "message" + (isMe ? " user" : "");
-      msgDiv.innerHTML = `
-        <img class="avatar" src="${avatarURL}" alt="${nickname}" />
-        <div class="text"><strong>${nickname}</strong><br>${text}</div>
-      `;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function addSystemMessage(text) {
-      const sys = document.createElement("div");
-      sys.className = "system-msg";
-      sys.style = "text-align:center; margin:10px; color:#888; font-style:italic;";
-      sys.textContent = text;
-      chatBox.appendChild(sys);
-    }
-
-    function showTypingIndicator(sender) {
-      typingIndicator.textContent = `${sender} is typing...`;
-      typingIndicator.style.display = "block";
-      clearTimeout(window.typingTimeout);
-      window.typingTimeout = setTimeout(() => {
-        typingIndicator.style.display = "none";
-      }, 2000);
-    }
-
-    messageInput.addEventListener("input", () => {
-      socket.send(JSON.stringify({ type: "typingGroup" }));
-    });
-
-    messageInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") leaveGroup();
-    });
-  </script>
+function openGroupsList(){
+ groupsList.style.display="block";
+ createGroupModal.style.display="none";
+ socket.send(JSON.stringify({type:"getGroups"}));
+}
+function openCreateGroup(){
+ createGroupModal.style.display="block";
+ groupsList.style.display="none";
+}
+function createNewGroup(){
+ const name=document.getElementById("newGroupName").value.trim();
+ if(!name)return alert("Enter group name!");
+ currentGroup=name;
+ groupTitle.textContent=`Group: ${name}`;
+ chatBox.innerHTML="";
+ createGroupModal.style.display="none";
+ socket.send(JSON.stringify({type:"createGroup",group:name,nickname:nick,avatar}));
+}
+function joinExistingGroup(group){
+ currentGroup=group;
+ groupTitle.textContent=`Group: ${group}`;
+ chatBox.innerHTML="";
+ groupsList.style.display="none";
+ socket.send(JSON.stringify({type:"joinGroup",group:group,nickname:nick,avatar}));
+}
+function leaveGroup(){
+ if(!currentGroup)return alert("You're not in a group!");
+ if(confirm("Leave current group?")){
+   socket.send(JSON.stringify({type:"leaveGroup"}));
+   currentGroup="";
+   groupTitle.textContent="Not in a group yet";
+   chatBox.innerHTML="";
+ }
+}
+function sendMessage(){
+ const msg=messageInput.value.trim();
+ if(!msg||!currentGroup)return;
+ appendMsg(nick,avatar,msg,true);
+ socket.send(JSON.stringify({type:"messageGroup",text:msg}));
+ messageInput.value="";
+}
+function appendMsg(nickname,avatarURL,text,isMe=false){
+ const div=document.createElement("div");
+ div.className="message"+(isMe?" user":"");
+ div.innerHTML=`<img class="avatar" src="${avatarURL}" alt="">
+ <div class="text"><strong>${nickname}</strong>${text}</div>`;
+ chatBox.appendChild(div);
+ chatBox.scrollTop=chatBox.scrollHeight;
+}
+function addSystemMessage(t){
+ const s=document.createElement("div");
+ s.className="system-msg";
+ s.textContent=t;
+ chatBox.appendChild(s);
+}
+function showTypingIndicator(sender){
+ typingIndicator.textContent=`${sender} is typing...`;
+ typingIndicator.style.display="block";
+ clearTimeout(window.typingTimeout);
+ window.typingTimeout=setTimeout(()=>typingIndicator.style.display="none",2000);
+}
+function toggleMenu(){
+ sidebar.classList.toggle("open");
+}
+messageInput.addEventListener("input",()=>{if(currentGroup)socket.send(JSON.stringify({type:"typingGroup"}));});
+messageInput.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+window.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+   groupsList.style.display="none";
+   createGroupModal.style.display="none";
+   sidebar.classList.remove("open");
+ }
+});
+</script>
 </body>
 </html>
