@@ -1,8 +1,4 @@
-// ───────────────────────────────────────────────
-// 💬 Mystery Meet Server (v2)
-// Supports: 1-on-1 Chat + Group Chat with Live Group List
-// ───────────────────────────────────────────────
-
+//  Mystery Meet  
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
@@ -21,7 +17,7 @@ const wss = new WebSocket.Server({ server });
 let waitingUser = null; // waiting for 1v1 pairing
 const pairings = new Map(); // ws → partner ws
 const groups = new Map(); // groupName → Set<ws>
-const userMeta = new Map(); // ws → {nickname, avatar, type, group?}
+const userMeta = new Map(); // ws → nickname, avatar, type, group?
 
 // ─── Utility ──────────────────────────────────────
 function send(ws, data) {
@@ -149,7 +145,7 @@ wss.on("connection", (ws) => {
         }
         break;
 
-      // ─── Group Chat ───────────────────────────
+      // ─── Group Chat ────────────────────
       case "createGroup": {
         const groupName = data.group?.trim();
         if (!groupName) {
@@ -251,8 +247,8 @@ wss.on("connection", (ws) => {
   });
 });
 
-// ─── Start Server ────────────────────────────────
-const PORT = process.env.PORT || 4014;
+// Start Server 
+const PORT = process.env.PORT || 4004;
 server.listen(PORT, () => {
   console.log(`✅ Mystery Meet 💬 server running on http://localhost:${PORT}`);
 });
