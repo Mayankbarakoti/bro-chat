@@ -40,7 +40,7 @@
       gap: 12px;
       flex: 1;
       overflow-y: auto;
-      padding-bottom: 100px; /* ensures last message is fully visible */
+      padding-bottom: 100px;
     }
 
     .profile-header {
@@ -138,7 +138,6 @@
       40% { opacity: 1; }
     }
 
-    /* ✅ Footer fix */
     .chat-footer {
       position: fixed;
       bottom: 0;
@@ -162,7 +161,7 @@
       font-size: 14px;
     }
 
-    .chat-footer button.send-btn {
+    .send-btn {
       padding: 12px 16px;
       border: none;
       border-radius: 25px;
@@ -170,13 +169,10 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-      margin-left: -5px; /* ✅ thoda left shift */
+      margin-left: -5px;
     }
 
-    .chat-footer button.send-btn:hover { opacity: 0.9; }
-
-    .chat-footer button.leave-btn {
+    .toggle-btn {
       padding: 12px 14px;
       border: none;
       border-radius: 25px;
@@ -184,170 +180,162 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .chat-footer button.leave-btn:hover { opacity: 0.9; }
-
-    /* ✅ Mobile adjustments */
-    @media (max-width: 600px) {
-      .chat-footer {
-        padding: 8px;
-        gap: 6px;
-      }
-
-      .chat-footer input {
-        font-size: 13px;
-        padding: 10px 12px;
-      }
-
-      .chat-footer button {
-        font-size: 13px;
-        padding: 10px 14px;
-      }
-
-      .message { max-width: 85%; }
     }
   </style>
 </head>
-<body>
 
+<body>
   <div class="chat-area">
     <div class="profile-header">
       <img id="userAvatar" class="avatar"/>
       <span id="userNick"></span>
     </div>
-    <div class="typing" id="typingIndicator">Stranger is typing<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
+
+    <div class="typing" id="typingIndicator">
+      Stranger is typing<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+    </div>
+
     <div class="messages" id="chatBox"></div>
   </div>
 
   <div class="chat-footer">
-    <button class="leave-btn" onclick="endChat()">❌</button>
-    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off"/>
+    <button id="toggleChatBtn" class="toggle-btn">Start Chat</button>
+    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" disabled/>
     <button class="send-btn" onclick="sendMessage()">📩</button>
   </div>
 
-  <audio id="sendSound" src="https://assets.mixkit.co/sfx/download/mixkit-clear-interface-notification-259.wav" preload="auto"></audio>
-  <audio id="receiveSound" src="https://assets.mixkit.co/sfx/download/mixkit-message-pop-2484.mp3" preload="auto"></audio>
+  <audio id="sendSound" src="https://assets.mixkit.co/sfx/download/mixkit-clear-interface-notification-259.wav"></audio>
+  <audio id="receiveSound" src="https://assets.mixkit.co/sfx/download/mixkit-message-pop-2484.mp3"></audio>
 
-  <script>
-    const chatBox = document.getElementById('chatBox');
-    const input = document.getElementById('messageInput');
-    const typing = document.getElementById('typingIndicator');
-    const sendSound = document.getElementById('sendSound');
-    const receiveSound = document.getElementById('receiveSound');
+<script>
+let isChatActive = false;
+let socket;
 
-    const profile = JSON.parse(localStorage.getItem('mysteryMeetProfile')) || {};
-    const nick = profile.nickname || 'Anonymous';
-    const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${encodeURIComponent(nick)}`;
+const toggleBtn = document.getElementById("toggleChatBtn");
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('messageInput');
+const typing = document.getElementById('typingIndicator');
+const sendSound = document.getElementById('sendSound');
+const receiveSound = document.getElementById('receiveSound');
 
-    document.getElementById('userNick').textContent = nick;
-    document.getElementById('userAvatar').src = avatar;
+const profile = JSON.parse(localStorage.getItem('mysteryMeetProfile')) || {};
+const nick = profile.nickname || 'Anonymous';
+const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${nick}`;
 
-    let strangerTypingTimeout;
+document.getElementById('userNick').textContent = nick;
+document.getElementById('userAvatar').src = avatar;
 
-    function scrollToBottom() {
-      chatBox.scrollTo({
-        top: chatBox.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
+function startChat() {
+  const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  socket = new WebSocket(`${protocol}://${location.host}`);
 
-    function appendMsg(nickname, avatarUrl, text, isMe = false) {
-      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      const msg = document.createElement('div');
-      msg.className = 'message ' + (isMe ? 'user' : 'stranger');
-      msg.innerHTML = `
-        <img class="avatar" src="${avatarUrl}" alt="${nickname}" />
-        <div class="bubble" data-name="${nickname}">${text}<div class="time">${time}</div></div>
-      `;
-      chatBox.appendChild(msg);
-      setTimeout(scrollToBottom, 100);
-      if (isMe) sendSound.play(); else receiveSound.play();
-    }
+  socket.addEventListener('open', () => {
+    socket.send(JSON.stringify({ type: 'join1v1', nickname: nick, avatar }));
+    addSys("Connecting to stranger...");
+  });
 
-    function addSys(text) {
-      const sysMsg = document.createElement('div');
-      sysMsg.className = 'system-msg';
-      sysMsg.textContent = text;
-      chatBox.appendChild(sysMsg);
-      setTimeout(scrollToBottom, 100);
-    }
+  socket.addEventListener('message', (event) => {
+    let data; try { data = JSON.parse(event.data); } catch { return; }
 
-    function showTyping() {
-      typing.style.display = 'block';
-      clearTimeout(strangerTypingTimeout);
-      strangerTypingTimeout = setTimeout(() => { typing.style.display = 'none'; }, 2000);
-    }
-
-    const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    const socket = new WebSocket(`${protocol}://${location.host}`);
-
-    socket.addEventListener('open', () => {
-      socket.send(JSON.stringify({ type: 'join1v1', nickname: nick, avatar }));
-      addSys('Connecting to stranger...');
-    });
-
-    socket.addEventListener('message', (event) => {
-      let data; 
-      try { 
-        data = JSON.parse(event.data); 
-      } catch { 
-        return; 
+    if (data.type === 'system') {
+      if (data.event === 'partner_connected') {
+        addSys("Stranger connected!");
+        input.disabled = false;
       }
-
-      switch (data.type) {
-        case 'system':
-          if (data.event === 'partner_connected') {
-            addSys('Stranger connected! Say hi 👋');
-          } else if (data.event === 'waiting') {
-            addSys('Waiting for a stranger to connect...');
-          } else if (data.event === 'partner_left') {
-            addSys('Stranger disconnected');
-            input.disabled = true;
-          }
-          break;
-        case 'message1v1':
-          appendMsg(data.nickname, data.avatar, data.text, false);
-          break;
-        case 'typing1v1':
-          showTyping();
-          break;
-      }
-    });
-
-    function sendMessage() {
-      const text = input.value.trim(); 
-      if (!text) return;
-      appendMsg(nick, avatar, text, true);
-      socket.send(JSON.stringify({ type: 'message1v1', text }));
-      input.value = '';
-    }
-
-    input.addEventListener('input', () => {
-      if (socket.readyState === WebSocket.OPEN) 
-        socket.send(JSON.stringify({ type: 'typing1v1' }));
-    });
-
-    input.addEventListener('keypress', e => { 
-      if (e.key === 'Enter') { 
-        e.preventDefault(); 
-        sendMessage(); 
-      } 
-    });
-
-    window.addEventListener('keydown', e => { 
-      if (e.key === 'Escape') endChat(); 
-    });
-
-    function endChat() {
-      if (confirm('Leave the chat?')) {
-        socket.send(JSON.stringify({ type: 'leave1v1' }));
-        chatBox.innerHTML = '';
-        addSys('You left the chat.');
+      else if (data.event === 'waiting') addSys("Waiting for a stranger...");
+      else if (data.event === 'partner_left') {
+        addSys("Stranger left the chat.");
         input.disabled = true;
       }
     }
-  </script>
+
+    if (data.type === 'message1v1') {
+      appendMsg(data.nickname, data.avatar, data.text, false);
+    }
+
+    if (data.type === 'typing1v1') showTyping();
+  });
+
+  isChatActive = true;
+  toggleBtn.textContent = "Leave Chat";
+  toggleBtn.style.background = "#ff3b3b";
+}
+
+function endChat() {
+  if (socket && socket.readyState === 1)
+    socket.send(JSON.stringify({ type: 'leave1v1' }));
+
+  chatBox.innerHTML = "";
+  addSys("You left the chat.");
+  input.disabled = true;
+
+  isChatActive = false;
+  toggleBtn.textContent = "Start Chat";
+  toggleBtn.style.background = "#ff4081";
+}
+
+toggleBtn.addEventListener("click", () => {
+  if (isChatActive) endChat();
+  else startChat();
+});
+
+function appendMsg(nickname, avatarUrl, text, isMe = false) {
+  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  const msg = document.createElement('div');
+  msg.className = 'message ' + (isMe ? 'user' : '');
+  msg.innerHTML = `
+    <img class="avatar" src="${avatarUrl}">
+    <div class="bubble" data-name="${nickname}">
+      ${text}
+      <div class="time">${time}</div>
+    </div>`;
+  chatBox.appendChild(msg);
+
+  (isMe ? sendSound : receiveSound).play();
+  setTimeout(() => chatBox.scrollTo({ top: chatBox.scrollHeight }), 50);
+}
+
+function addSys(text) {
+  const el = document.createElement("div");
+  el.className = "system-msg";
+  el.textContent = text;
+  chatBox.appendChild(el);
+}
+
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  appendMsg(nick, avatar, text, true);
+  socket.send(JSON.stringify({ type: 'message1v1', text }));
+  input.value = "";
+}
+
+input.addEventListener("input", () => {
+  if (socket && socket.readyState === 1)
+    socket.send(JSON.stringify({ type: 'typing1v1' }));
+});
+
+function showTyping() {
+  typing.style.display = "block";
+  clearTimeout(window.typingTimer);
+  window.typingTimer = setTimeout(() => typing.style.display = "none", 1500);
+}
+
+/* -------------------------------------------------
+      KEYBOARD SHORTCUTS (ENTER + ESC)
+-------------------------------------------------- */
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && isChatActive) {
+    sendMessage();
+  }
+  if (e.key === "Escape") {
+    if (isChatActive) endChat();
+    else startChat();
+  }
+});
+
+</script>
+
 </body>
 </html>
