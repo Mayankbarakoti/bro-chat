@@ -248,7 +248,7 @@ wss.on("connection", (ws) => {
 });
 
 // Start Server 
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 4004;
 server.listen(PORT, () => {
   console.log(`✅ Mystery Meet 💬 server running on http://localhost:${PORT}`);
 });
