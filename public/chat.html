@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mystery Meet 💀 - 1v1 Chat</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+  <title>Talk Yaar🫂 - 1v1 Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #a8edea, #fed6e3);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
     }
 
     @keyframes gradientBG {
@@ -24,23 +27,21 @@
       100% { background-position: 0% 50%; }
     }
 
+    /* MAIN CHAT AREA */
     .chat-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 15px;
-      position: relative;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      bottom: 70px;
       overflow-y: auto;
-      scroll-behavior: smooth;
+      padding: 12px;
+      padding-bottom: 120px;
     }
 
     .messages {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      flex: 1;
-      overflow-y: auto;
-      padding-bottom: 100px;
+      word-break: break-word;
     }
 
     .profile-header {
@@ -53,8 +54,7 @@
     }
 
     .profile-header .avatar {
-      width: 45px;
-      height: 45px;
+      width: 45px; height: 45px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -62,7 +62,7 @@
     .message {
       display: flex;
       align-items: flex-start;
-      max-width: 80%;
+      max-width: 85%;
     }
 
     .message.user {
@@ -71,11 +71,9 @@
     }
 
     .avatar {
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 50%;
       object-fit: cover;
-      margin: 0 8px;
       flex-shrink: 0;
     }
 
@@ -84,9 +82,8 @@
       padding: 10px 15px;
       border-radius: 18px;
       font-size: 14px;
-      word-break: break-word;
       box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-      color: #333;
+      margin: 0 8px;
     }
 
     .user .bubble {
@@ -105,25 +102,26 @@
 
     .user .bubble::before { color: #fff; }
 
-    .bubble .time {
+    .time {
       font-size: 10px;
-      color: #888;
       text-align: right;
       margin-top: 4px;
+      opacity: 0.8;
     }
 
     .system-msg {
       text-align: center;
-      color: #666;
-      font-style: italic;
+      color: #555;
       font-size: 13px;
+      font-style: italic;
     }
 
+    /* TYPING */
     .typing {
+      display: none;
       font-style: italic;
       color: #555;
-      display: none;
-      margin-bottom: 8px;
+      margin-left: 10px;
     }
 
     .typing .dots span {
@@ -138,18 +136,18 @@
       40% { opacity: 1; }
     }
 
+    /* FOOTER */
     .chat-footer {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      align-items: center;
+      bottom: 0; left: 0; right: 0;
       padding: 10px;
-      gap: 8px;
       background: rgba(255,255,255,0.9);
       backdrop-filter: blur(10px);
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 70px;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     .chat-footer input {
@@ -163,31 +161,38 @@
 
     .send-btn {
       padding: 12px 16px;
-      border: none;
       border-radius: 25px;
+      border: none;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white;
       font-weight: bold;
       cursor: pointer;
-      margin-left: -5px;
     }
 
     .toggle-btn {
       padding: 12px 14px;
-      border: none;
       border-radius: 25px;
+      border: none;
       background: #ff4081;
       color: white;
       font-weight: bold;
       cursor: pointer;
     }
+
+    /* MOBILE FIXES */
+    @media (max-width: 480px) {
+      .message { max-width: 90%; }
+      .bubble { font-size: 13px; padding: 9px 12px; }
+      .chat-area { padding: 10px; }
+    }
   </style>
 </head>
 
 <body>
-  <div class="chat-area">
+
+  <div class="chat-area" id="chatArea">
     <div class="profile-header">
-      <img id="userAvatar" class="avatar"/>
+      <img id="userAvatar" class="avatar">
       <span id="userNick"></span>
     </div>
 
@@ -200,7 +205,7 @@
 
   <div class="chat-footer">
     <button id="toggleChatBtn" class="toggle-btn">Start Chat</button>
-    <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off" disabled/>
+    <input type="text" id="messageInput" placeholder="Type..." disabled>
     <button class="send-btn" onclick="sendMessage()">📩</button>
   </div>
 
@@ -212,49 +217,53 @@ let isChatActive = false;
 let socket;
 
 const toggleBtn = document.getElementById("toggleChatBtn");
-const chatBox = document.getElementById('chatBox');
-const input = document.getElementById('messageInput');
-const typing = document.getElementById('typingIndicator');
-const sendSound = document.getElementById('sendSound');
-const receiveSound = document.getElementById('receiveSound');
+const chatBox = document.getElementById("chatBox");
+const input = document.getElementById("messageInput");
+const typing = document.getElementById("typingIndicator");
+const chatArea = document.getElementById("chatArea");
 
-const profile = JSON.parse(localStorage.getItem('mysteryMeetProfile')) || {};
-const nick = profile.nickname || 'Anonymous';
+const profile = JSON.parse(localStorage.getItem("mysteryMeetProfile")) || {};
+const nick = profile.nickname || "Anonymous";
 const avatar = profile.avatar || `https://i.pravatar.cc/150?u=${nick}`;
 
-document.getElementById('userNick').textContent = nick;
-document.getElementById('userAvatar').src = avatar;
+document.getElementById("userNick").textContent = nick;
+document.getElementById("userAvatar").src = avatar;
+
+function scrollBottom() {
+  setTimeout(() => chatArea.scrollTop = chatArea.scrollHeight, 30);
+}
 
 function startChat() {
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
   socket = new WebSocket(`${protocol}://${location.host}`);
 
-  socket.addEventListener('open', () => {
+  socket.onopen = () => {
     socket.send(JSON.stringify({ type: 'join1v1', nickname: nick, avatar }));
-    addSys("Connecting to stranger...");
-  });
+    addSys("Connecting...");
+  };
 
-  socket.addEventListener('message', (event) => {
-    let data; try { data = JSON.parse(event.data); } catch { return; }
+  socket.onmessage = (event) => {
+    let d;
+    try { d = JSON.parse(event.data); } catch { return; }
 
-    if (data.type === 'system') {
-      if (data.event === 'partner_connected') {
+    if (d.type === "system") {
+      if (d.event === "partner_connected") {
         addSys("Stranger connected!");
         input.disabled = false;
-      }
-      else if (data.event === 'waiting') addSys("Waiting for a stranger...");
-      else if (data.event === 'partner_left') {
-        addSys("Stranger left the chat.");
+      } 
+      else if (d.event === "waiting") addSys("Waiting for partner...");
+      else if (d.event === "partner_left") {
+        addSys("Stranger left.");
         input.disabled = true;
       }
     }
 
-    if (data.type === 'message1v1') {
-      appendMsg(data.nickname, data.avatar, data.text, false);
+    if (d.type === "message1v1") {
+      appendMsg(d.nickname, d.avatar, d.text, false);
     }
 
-    if (data.type === 'typing1v1') showTyping();
-  });
+    if (d.type === "typing1v1") showTyping();
+  };
 
   isChatActive = true;
   toggleBtn.textContent = "Leave Chat";
@@ -263,10 +272,10 @@ function startChat() {
 
 function endChat() {
   if (socket && socket.readyState === 1)
-    socket.send(JSON.stringify({ type: 'leave1v1' }));
+    socket.send(JSON.stringify({ type: "leave1v1" }));
 
   chatBox.innerHTML = "";
-  addSys("You left the chat.");
+  addSys("You left.");
   input.disabled = true;
 
   isChatActive = false;
@@ -274,45 +283,48 @@ function endChat() {
   toggleBtn.style.background = "#ff4081";
 }
 
-toggleBtn.addEventListener("click", () => {
-  if (isChatActive) endChat();
-  else startChat();
-});
+toggleBtn.onclick = () => isChatActive ? endChat() : startChat();
 
-function appendMsg(nickname, avatarUrl, text, isMe = false) {
-  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  const msg = document.createElement('div');
-  msg.className = 'message ' + (isMe ? 'user' : '');
+function appendMsg(nickname, avatarUrl, text, isMe) {
+  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+
+  const msg = document.createElement("div");
+  msg.className = "message " + (isMe ? "user" : "");
   msg.innerHTML = `
     <img class="avatar" src="${avatarUrl}">
     <div class="bubble" data-name="${nickname}">
       ${text}
       <div class="time">${time}</div>
-    </div>`;
+    </div>
+  `;
+
   chatBox.appendChild(msg);
 
   (isMe ? sendSound : receiveSound).play();
-  setTimeout(() => chatBox.scrollTo({ top: chatBox.scrollHeight }), 50);
+  scrollBottom();
 }
 
-function addSys(text) {
+function addSys(t) {
   const el = document.createElement("div");
   el.className = "system-msg";
-  el.textContent = text;
+  el.textContent = t;
   chatBox.appendChild(el);
+  scrollBottom();
 }
 
 function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
+
   appendMsg(nick, avatar, text, true);
-  socket.send(JSON.stringify({ type: 'message1v1', text }));
+  socket.send(JSON.stringify({ type: "message1v1", text }));
   input.value = "";
+  scrollBottom();
 }
 
 input.addEventListener("input", () => {
   if (socket && socket.readyState === 1)
-    socket.send(JSON.stringify({ type: 'typing1v1' }));
+    socket.send(JSON.stringify({ type: "typing1v1" }));
 });
 
 function showTyping() {
@@ -321,20 +333,11 @@ function showTyping() {
   window.typingTimer = setTimeout(() => typing.style.display = "none", 1500);
 }
 
-/* -------------------------------------------------
-      KEYBOARD SHORTCUTS (ENTER + ESC)
--------------------------------------------------- */
-
+/* Shortcuts */
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && isChatActive) {
-    sendMessage();
-  }
-  if (e.key === "Escape") {
-    if (isChatActive) endChat();
-    else startChat();
-  }
+  if (e.key === "Enter" && isChatActive) sendMessage();
+  if (e.key === "Escape") isChatActive ? endChat() : startChat();
 });
-
 </script>
 
 </body>

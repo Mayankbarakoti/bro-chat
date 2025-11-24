@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -10,9 +10,12 @@
   <meta name="keywords" content="random chat, stranger chat, talkyaar, online chat, anonymous chat">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://talkyaar.com">
-  
-  <!-- Favicon / Tab Icon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="shortcut icon" href="assets/logo.png">
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet"/>
@@ -24,23 +27,19 @@
   <meta property="og:url" content="https://talkyaar.com">
   <meta property="og:type" content="website">
 
-  <!-- Structured Data (JSON-LD) for Search / Rich Snippet -->
+  <!-- Structured Data (Google Rich Logo Snippet) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
+    "@type": "Organization",
     "name": "Talkyaar",
     "url": "https://talkyaar.com",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://talkyaar.com/?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    },
-    "logo": "https://talkyaar.com/assets/logo.png"
+    "logo": "https://talkyaar.com/assets/logo.png",
+    "sameAs": []
   }
   </script>
 
-  <!-- Existing Styles -->
+  <!-- Existing + Mobile Fix Styles -->
   <style>
     * {
       margin: 0;
@@ -54,7 +53,7 @@
       color: #222;
       scroll-behavior: smooth;
       overflow-x: hidden;
-      background: #a8edea; /* Static background for header & welcome */
+      background: #a8edea;
     }
 
     /* Header / Navbar */
@@ -74,7 +73,7 @@
     .logo {
       font-size: 1.8rem;
       font-weight: 700;
-      color: #6a11cb; /* Stable gradient-like color */
+      color: #6a11cb;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -88,6 +87,7 @@
       display: flex;
       align-items: center;
       gap: 25px;
+      flex-wrap: wrap;
     }
 
     nav a {
@@ -229,6 +229,48 @@
       box-shadow: 0 -6px 20px rgba(0,0,0,0.08);
     }
 
+    /* Extra Mobile Fixes */
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+      }
+
+      nav {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .start-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+      }
+
+      .header-content h1 {
+        font-size: 1.8rem;
+      }
+
+      .header-content p {
+        font-size: 1rem;
+      }
+
+      .section {
+        padding: 40px 15px;
+        text-align: center;
+      }
+
+      .section img {
+        max-width: 300px;
+      }
+
+      .card {
+        padding: 22px;
+        min-width: unset;
+      }
+    }
+
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -252,8 +294,10 @@
         margin-top: 20px;
       }
     }
+
   </style>
 </head>
+
 <body>
 
   <header>
@@ -274,7 +318,7 @@
   </div>
 
   <div class="sections-wrapper">
-    <!-- Sections -->
+
     <section class="section" id="about">
       <div class="card">
         <h2>What is Mystery Meet?</h2>
@@ -331,6 +375,7 @@
       </div>
       <img src="https://i.redd.it/n1rb7351160f1.gif" alt="Help Support">
     </section>
+
   </div>
 
   <footer>
